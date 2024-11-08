@@ -5,7 +5,7 @@ import PokemonListView from '../views/PokemonListView.vue'
 
 const routes = [
   { path: '/', component: Home },
-  { path: '/pokemondetail', component: PokemonDetailsView },
+  { path: '/pokemondetail/:name', component: PokemonDetailsView },
   { path: '/pokemonlist', component: PokemonListView },
 ]
 
