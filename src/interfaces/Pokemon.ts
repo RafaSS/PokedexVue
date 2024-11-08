@@ -1,4 +1,16 @@
-export interface Pokemon {
+export interface PokemonList {
+  count: number;
+  next: null;
+  previous: null;
+  results: Result[];
+}
+
+interface Result {
+  name: string;
+  url: string;
+}
+
+export interface PokemonDetails {
     id: number;
     name: string;
     base_experience: number;
