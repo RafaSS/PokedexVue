@@ -1,161 +1,101 @@
-<template>
-  <div class="max-w-3xl mx-auto p-5">
-    <h1 class="text-3xl font-bold mb-4 text-center text-red-500">Pokédex</h1>
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { fetchPokemonList } from '../api/pokemonApi';
 
-    <!-- Pokémon List -->
-    <div class="mb-8 bg-black p-4 rounded">
-      <h2 class="text-xl font-semibold mb-3 text-red-500">Select a Pokémon:</h2>
+const router = useRouter();
+const pokemonList = ref<{ name: string }[]>([]);
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+const totalPokemons = ref(0); // Will hold the total number of Pokémon to calculate pages
+
+// Fetch Pokémon list for the current page
+const fetchPokemons = async () => {
+  const offset = (currentPage.value - 1) * itemsPerPage.value;
+  const response = await fetchPokemonList(offset, itemsPerPage.value);
+  pokemonList.value = response.results;
+  totalPokemons.value = response.count;
+};
+
+// Handle next/previous page navigation
+const goToNextPage = () => {
+  if (currentPage.value < Math.ceil(totalPokemons.value / itemsPerPage.value)) {
+    currentPage.value += 1;
+    fetchPokemons();
+  }
+};
+
+const goToPreviousPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value -= 1;
+    fetchPokemons();
+  }
+};
+
+// Load initial Pokémon list
+onMounted(fetchPokemons);
+
+// Redirect to Pokémon detail route
+const goToPokemonDetail = (name: string) => {
+  router.push(`/pokemondetail/${name}`);
+};
+</script>
+
+<template>
+  <!-- Navbar -->
+  <nav class="bg-red-600 p-4 text-white flex justify-between items-center">
+    <h1 class="text-lg font-bold cursor-pointer">Pokedex</h1>
+    <div class="flex space-x-4">
+      <button
+        class="bg-red-600 text-red-600 px-3 py-1 rounded hover:bg-red-100"
+        @click="router.push('/')"
+      >
+        Home
+      </button>
+      <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-100">
+        Favorites
+      </button>
+    </div>
+  </nav>
+
+  <!-- Pokémon List with Pagination -->
+  <div class="max-w-2xl mx-auto p-5">
+    <div class="bg-red-600 p-5 rounded-lg shadow-lg">
+      <h2 class="text-xl font-semibold mb-4 text-white">Select a Pokémon:</h2>
       <ul class="space-y-2">
         <li
           v-for="pokemon in pokemonList"
           :key="pokemon.name"
-          @click="selectPokemon(pokemon.name)"
-          class="cursor-pointer text-red-500 hover:underline"
+          @click="goToPokemonDetail(pokemon.name)"
+          class="cursor-pointer text-white hover:underline"
         >
           {{ pokemon.name }}
         </li>
       </ul>
-    </div>
 
-    <!-- Pokémon Details -->
-    <div
-      v-if="selectedPokemonDetail"
-      class="p-5 border border-red-500 rounded-lg shadow-md bg-black text-red-500"
-    >
-      <h2 class="text-2xl font-bold mb-4">{{ selectedPokemonDetail.name }}</h2>
-      <div class="flex flex-col items-center">
-        <img
-          :src="selectedPokemonDetail.sprites.front_default"
-          alt="Pokemon Image"
-          class="mb-4"
-        />
-        <p><strong>Height:</strong> {{ selectedPokemonDetail.height }}</p>
-        <p><strong>Weight:</strong> {{ selectedPokemonDetail.weight }}</p>
-        <p>
-          <strong>Base Experience:</strong>
-          {{ selectedPokemonDetail.base_experience }}
-        </p>
-        <p><strong>Abilities:</strong></p>
-        <ul>
-          <li
-            v-for="ability in selectedPokemonDetail.abilities"
-            :key="ability.ability.name"
-          >
-            {{ ability.ability.name }}
-          </li>
-        </ul>
-      </div>
-
-      <!-- Evolution Navigation Buttons -->
-      <div class="flex space-x-2 mt-4">
+      <!-- Pagination Controls -->
+      <div class="flex justify-between items-center mt-6">
         <button
-          v-if="selectedPokemonDetail.species?.url"
-          @click="goToEvolution('previous')"
-          class="px-4 py-2 bg-red-500 text-black hover:bg-red-600"
+          @click="goToPreviousPage"
+          :disabled="currentPage === 1"
+          class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          ← Previous Evolution
+          Previous
         </button>
+        <span class="text-red-700">
+          Page {{ currentPage }} of {{ Math.ceil(totalPokemons / itemsPerPage) }}
+        </span>
         <button
-          v-if="selectedPokemonDetail.species?.url"
-          @click="goToEvolution('next')"
-          class="px-4 py-2 bg-red-500 text-black hover:bg-red-600"
+          @click="goToNextPage"
+          :disabled="currentPage >= Math.ceil(totalPokemons / itemsPerPage)"
+          class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Next Evolution →
+          Next
         </button>
       </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import {
-  fetchPokemonList,
-  fetchPokemonDetails,
-  fetchPokemonEvolutionChain,
-  fetchPokemonSpecies,
-} from '../api/pokemonApi';
-import type {
-  PokemonDetails,
-  EvolutionChain,
-  PokemonSpecies,
-} from '@/interfaces/Pokemon';
-
-const router = useRouter();
-const pokemonList = ref<{ name: string; url: string }[]>([]);
-const selectedPokemonDetail = ref<PokemonDetails | null>(null);
-const pokemonEvotion = ref<EvolutionChain | null>(null);
-const pokemonSpecies = ref<PokemonSpecies | null>(null);
-
-// Fetch list of Pokémon
-onMounted(async () => {
-  const response = await fetchPokemonList(20, 0);
-  pokemonList.value = response.results;
-});
-
-// Select Pokémon and load details
-const selectPokemon = async (name: string) => {
-  selectedPokemonDetail.value = await fetchPokemonDetails(name);
-  pokemonSpecies.value = await fetchPokemonSpecies(name);
-  pokemonEvotion.value = await fetchPokemonEvolutionChain(
-    extractEvolutionIdFromUrl(
-      pokemonSpecies.value?.evolution_chain.url as string,
-    ),
-  );
-};
-
-// Evolution navigation logic
-const goToEvolution = async (direction: 'next' | 'previous') => {
-  if (!pokemonEvotion.value) return;
-
-  if (direction === 'next') {
-    if (pokemonEvotion.value.chain.evolves_to[0]) {
-      const nextSpecies = findNextEvolution(
-        pokemonEvotion.value.chain,
-        selectedPokemonDetail.value?.name as string,
-      );
-      if (nextSpecies) selectPokemon(nextSpecies);
-    }
-  } else if (direction === 'previous') {
-    const previousSpecies = findPreviousEvolution(
-      pokemonEvotion.value.chain,
-      selectedPokemonDetail.value?.name as string,
-    );
-    if (previousSpecies) selectPokemon(previousSpecies);
-  }
-};
-
-// Helper functions for evolution navigation
-const findPreviousEvolution = (
-  chain: any,
-  currentName: string,
-): string | null => {
-  if (!chain) return null;
-  if (chain.evolves_to.some((e: any) => e.species.name === currentName)) {
-    return chain.species.name;
-  }
-  for (const evolution of chain.evolves_to) {
-    const result = findPreviousEvolution(evolution, currentName);
-    if (result) return result;
-  }
-  return null;
-};
-
-const findNextEvolution = (chain: any, currentName: string): string | null => {
-  if (!chain) return null;
-  if (chain.species.name === currentName && chain.evolves_to[0]) {
-    return chain.evolves_to[0].species.name;
-  }
-  for (const evolution of chain.evolves_to) {
-    const result = findNextEvolution(evolution, currentName);
-    if (result) return result;
-  }
-  return null;
-};
-
-const extractEvolutionIdFromUrl = (url: string): number => {
-  const match = url.match(/\/(\d+)\/?$/);
-  return match ? parseInt(match[1], 10) : 0;
-};
-</script>
+<style scoped>
+</style>
