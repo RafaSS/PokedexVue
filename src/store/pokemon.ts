@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { fetchPokemonList, fetchPokemonDetails } from '../api/pokemonApi';
-import type {  PokemonDetails, PokemonList } from '../interfaces/Pokemon';
+import type { PokemonDetails, PokemonList } from '../interfaces/Pokemon';
 
 export const usePokemonStore = defineStore('pokemon', () => {
   const pokemonList = ref<PokemonList | null>(null);
@@ -15,6 +15,16 @@ export const usePokemonStore = defineStore('pokemon', () => {
   async function loadPokemonDetails(name: string) {
     selectedPokemon.value = await fetchPokemonDetails(name);
   }
+
+  async function saveFavoritePokemon(pokemon: PokemonDetails) {
+
+  }
+
+  async function removeFavoritePokemon(pokemon: PokemonDetails) { }
+
+  async function loadFavoritePokemon(pokemon: PokemonDetails) { }
+
+
 
   return {
     pokemonList,
