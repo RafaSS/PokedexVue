@@ -11,6 +11,7 @@ import {
   PokemonDetails,
   PokemonSpecies,
 } from '@/interfaces/Pokemon';
+import { usePokemonStore } from '../store/pokemon';
 
 const route = useRoute();
 const router = useRouter();
@@ -18,6 +19,7 @@ const pokemonDetail = ref<PokemonDetails>();
 const pokemonEvotion = ref<EvolutionChain>();
 const pokemonSpecies = ref<PokemonSpecies>();
 const isFavorite = ref(false);
+const currentPage = ref(1); // Added for pagination
 
 const loadData = async () => {
   pokemonDetail.value = await fetchPokemonDetails(route.params.name as string);
@@ -26,6 +28,9 @@ const loadData = async () => {
     extractEvolutionIdFromUrl(
       pokemonSpecies.value?.evolution_chain.url as string,
     ),
+  );
+  isFavorite.value = await usePokemonStore().isFavoritePokemon(
+    pokemonDetail.value.name as string,
   );
 };
 
@@ -43,7 +48,9 @@ const goToEvolution = async (direction: 'next' | 'previous') => {
         route.params.name as string,
       );
       if (nextSpecies) {
-        router.push(`/pokemondetail/${nextSpecies}`);
+        router.push(
+          `/pokemondetail/${nextSpecies}?page=${currentPage.value + 1}`,
+        );
       }
     }
   } else if (direction === 'previous') {
@@ -52,17 +59,25 @@ const goToEvolution = async (direction: 'next' | 'previous') => {
       route.params.name as string,
     );
     if (previousSpecies) {
-      router.push(`/pokemondetail/${previousSpecies}`);
+      router.push(
+        `/pokemondetail/${previousSpecies}?page=${currentPage.value - 1}`,
+      );
     }
   }
 };
 
-const toggleFavorite = () => {
+const toggleFavorite = async () => {
   isFavorite.value = !isFavorite.value;
   if (isFavorite.value) {
-    
+    if (pokemonDetail.value) {
+      usePokemonStore().saveFavoritePokemon(pokemonDetail.value);
+      const favorites = await usePokemonStore().loadFavoritePokemon();
+      console.log(favorites);
+    }
   } else {
-    // Remove from favorites
+    usePokemonStore().removeFavoritePokemon(
+      pokemonDetail.value?.name as string,
+    );
   }
 };
 
@@ -104,11 +119,25 @@ const extractEvolutionIdFromUrl = (url: string): number => {
 </script>
 
 <template>
-  <nav class="bg-gradient-to-r from-red-500 to-yellow-500 p-4 text-white flex justify-between items-center">
-    <h1 class="text-lg font-bold cursor-pointer" @click="goToEvolution('previous')">Pokedex</h1>
+  <nav
+    class="bg-gradient-to-r from-red-500 to-yellow-500 p-4 text-white flex justify-between items-center"
+  >
+    <h1
+      class="text-lg font-bold cursor-pointer"
+      @click="goToEvolution('previous')"
+    >
+      Pokedex
+    </h1>
     <div class="flex space-x-4">
-      <button class="bg-white text-red-500 px-3 py-1 rounded hover:bg-gray-200" @click="router.push('/')">Home</button>
-      <button class="bg-white text-red-500 px-3 py-1 rounded hover:bg-gray-200">Favorites</button>
+      <button
+        class="bg-white text-red-500 px-3 py-1 rounded hover:bg-gray-200"
+        @click="router.push('/')"
+      >
+        Home
+      </button>
+      <button class="bg-white text-red-500 px-3 py-1 rounded hover:bg-gray-200">
+        Favorites
+      </button>
     </div>
   </nav>
   <div
@@ -116,8 +145,20 @@ const extractEvolutionIdFromUrl = (url: string): number => {
   >
     <h1 class="text-2xl font-bold mb-4">{{ pokemonDetail?.name }}</h1>
     <div class="absolute top-2 right-2" @click="toggleFavorite">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" :class="{'text-yellow-400': isFavorite, 'text-gray-400': !isFavorite}" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.286 3.957c.3.921-.755 1.688-1.54 1.118l-3.37-2.455a1 1 0 00-1.175 0l-3.37 2.455c-.784.57-1.838-.197-1.54-1.118l1.286-3.957a1 1 0 00-.364-1.118L2.98 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6"
+        :class="{ 'text-yellow-400': isFavorite, 'text-gray-400': !isFavorite }"
+        fill="currentColor"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.286 3.957c.3.921-.755 1.688-1.54 1.118l-3.37-2.455a1 1 0 00-1.175 0l-3.37 2.455c-.784.57-1.838-.197-1.54-1.118l1.286-3.957a1 1 0 00-.364-1.118L2.98 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z"
+        />
       </svg>
     </div>
     <div class="flex flex-col items-center">

@@ -17,12 +17,45 @@ export const usePokemonStore = defineStore('pokemon', () => {
   }
 
   async function saveFavoritePokemon(pokemon: PokemonDetails) {
-
+    // Save the favorite pokemon to the local storage
+    const favoritePokemon = localStorage.getItem('favoritePokemon');
+    if (favoritePokemon) {
+      const favoritePokemonList = JSON.parse(favoritePokemon);
+      favoritePokemonList.push(pokemon);
+      localStorage.setItem('favoritePokemon', JSON.stringify(favoritePokemonList));
+    } else {
+      localStorage.setItem('favoritePokemon', JSON.stringify([pokemon]));
+    }
   }
 
-  async function removeFavoritePokemon(pokemon: PokemonDetails) { }
+  async function removeFavoritePokemon(name: string) {
+    const favoritePokemon = localStorage.getItem('favoritePokemon');
+    if (favoritePokemon) {
+      const favoritePokemonList = JSON.parse(favoritePokemon);
+      const newFavoritePokemonList = favoritePokemonList.filter((pokemon: PokemonDetails) => pokemon.name !== name);
+      localStorage.setItem('favoritePokemon', JSON.stringify(newFavoritePokemonList));
+    }
+  }
 
-  async function loadFavoritePokemon(pokemon: PokemonDetails) { }
+  async function isFavoritePokemon(name: string) {
+    const favoritePokemon = localStorage.getItem('favoritePokemon');
+    if (favoritePokemon) {
+      const favoritePokemonList = JSON.parse(favoritePokemon);
+      return favoritePokemonList.some((pokemon: PokemonDetails) => pokemon.name === name);
+    } else {
+      return false;
+    }
+  }
+
+  async function loadFavoritePokemon() {
+    const favoritePokemon = localStorage.getItem('favoritePokemon');
+    if (favoritePokemon) {
+      const favoritePokemonList = JSON.parse(favoritePokemon);
+      return favoritePokemonList;
+    } else {
+      return [];
+    }
+  }
 
 
 
@@ -31,5 +64,10 @@ export const usePokemonStore = defineStore('pokemon', () => {
     selectedPokemon,
     loadPokemonList,
     loadPokemonDetails,
+    saveFavoritePokemon,
+    removeFavoritePokemon,
+    loadFavoritePokemon,
+    isFavoritePokemon,
   };
 });
+
