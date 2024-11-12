@@ -18,38 +18,49 @@ const goToPokemonDetail = (name: string) => {
 };
 
 const searchPokemon = async () => {
-  pokemonListSearch.value = pokemonList.value?.results?.filter((pokemon: Result) =>
-    pokemon.name.includes(inputValue.value),
-  ).slice(0, 3) || [];
+  pokemonListSearch.value =
+    pokemonList.value?.results
+      ?.filter((pokemon: Result) => pokemon.name.includes(inputValue.value))
+      .slice(0, 3) || [];
 };
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col md:flex-row items-center justify-center p-4">
-    <div class="w-full md:w-auto">
-      <input
-        v-model="inputValue"
-        @input="searchPokemon"
-        type="text"
-        class="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        placeholder="Search Pokemon..."
-      />
-      <ul class="mt-2">
-        <li 
-          v-for="pokemon in pokemonListSearch" 
+  <div
+    class="min-h-screen flex flex-col md:flex-row items-center justify-center p-4"
+  >
+    <div
+      class="w-full md:w-auto flex flex-col md:flex-row items-center relative"
+    >
+      <div
+        class="flex items-center w-full md:w-auto rounded-lg focus-within:ring-2 focus-within:ring-blue-500"
+      >
+        <input
+          v-model="inputValue"
+          @input="searchPokemon"
+          type="text"
+          class="flex-1 px-4 py-2 focus:outline-none"
+          placeholder="Search Pokemon..."
+        />
+        <button
+          @click="goToPokemonDetail('bulbasaur')"
+          class="px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 focus:outline-none"
+        >
+          🔍
+        </button>
+      </div>
+      <ul
+        class="absolute top-full left-0 mt-1 w-full rounded-lg shadow-lg z-10"
+      >
+        <li
+          v-for="pokemon in pokemonListSearch"
           :key="pokemon.name"
-          class="p-2 hover:bg-red-900 rounded"
+          class="p-2 hover:bg-red-900 rounded cursor-pointer"
           @click="goToPokemonDetail(pokemon.name)"
         >
           {{ pokemon.name }}
         </li>
       </ul>
     </div>
-    <button
-      @click="goToPokemonDetail('bulbasaur')"
-      class="mt-4 md:mt-0 md:ml-4 px-4 py-2 w-full md:w-auto bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-    >
-      🔍
-    </button>
   </div>
 </template>
