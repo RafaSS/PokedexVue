@@ -5,14 +5,14 @@ import { usePokemonStore } from '../store/pokemon';
 
 const router = useRouter();
 const pokemonList = ref<{ name: string }[]>([]);
+const store = usePokemonStore();
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
 const totalPokemons = ref(0);
 
 // Fetch Pokémon list for the current page
-const fetchPokemons = async () => {
-    const store = usePokemonStore();
-    await store.loadFavoritePokemon();
+const fetchPokemons = () => {
+    store.loadFavoritePokemon(currentPage.value, itemsPerPage.value);
     pokemonList.value = store.favoritePokemon;
     totalPokemons.value = store.favoritePokemon.length;
 };
@@ -44,7 +44,7 @@ const goToPokemonDetail = (name: string) => {
 <template>
     <!-- Navbar -->
     <nav class="bg-red-600 p-4 text-white flex justify-between items-center">
-        <h1 class="text-lg font-bold cursor-pointer" @click="router.push('/')">Pokedex</h1>
+        <h1 class="text-lg font-bold cursor-pointer" @click="router.push('/')">Favourites</h1>
         <div class="flex space-x-4">
             <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-100" @click="router.push('/')">
                 Home

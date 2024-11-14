@@ -71,8 +71,6 @@ const toggleFavorite = async () => {
   if (isFavorite.value) {
     if (pokemonDetail.value) {
       usePokemonStore().saveFavoritePokemon(pokemonDetail.value);
-      const favorites = await usePokemonStore().loadFavoritePokemon();
-      console.log(favorites);
     }
   } else {
     usePokemonStore().removeFavoritePokemon(

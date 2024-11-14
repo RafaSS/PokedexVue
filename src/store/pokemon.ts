@@ -1,21 +1,10 @@
 // src/store/pokemon.ts
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { fetchPokemonList, fetchPokemonDetails } from '../api/pokemonApi';
-import type { PokemonDetails, PokemonList } from '../interfaces/Pokemon';
+import type { PokemonDetails } from '../interfaces/Pokemon';
 
 export const usePokemonStore = defineStore('pokemon', () => {
-  const pokemonList = ref<PokemonList | null>(null);
-  const selectedPokemon = ref<PokemonDetails | null>(null);
   const favoritePokemon = ref<PokemonDetails[]>([]);
-
-  async function loadPokemonList(limit = 10, offset = 0) {
-    pokemonList.value = await fetchPokemonList(limit, offset);
-  }
-
-  async function loadPokemonDetails(name: string) {
-    selectedPokemon.value = await fetchPokemonDetails(name);
-  }
 
   function saveFavoritePokemon(pokemon: PokemonDetails) {
     const storedFavorites = localStorage.getItem('favoritePokemon');
@@ -43,17 +32,16 @@ export const usePokemonStore = defineStore('pokemon', () => {
     return false;
   }
 
-  function loadFavoritePokemon(): void {
+  function loadFavoritePokemon(page: number, pageSize: number): void {
     const storedFavorites = localStorage.getItem('favoritePokemon');
-    favoritePokemon.value =  JSON.parse(storedFavorites || '[]');
+    const favoritePokemonList = JSON.parse(storedFavorites || '[]');
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    favoritePokemon.value = favoritePokemonList.slice(start, end);
   }
 
   return {
-    pokemonList,
-    selectedPokemon,
     favoritePokemon,
-    loadPokemonList,
-    loadPokemonDetails,
     saveFavoritePokemon,
     removeFavoritePokemon,
     loadFavoritePokemon,
