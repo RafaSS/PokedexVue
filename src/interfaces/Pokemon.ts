@@ -25,7 +25,7 @@ export interface PokemonDetails {
     location_area_encounters: string;
     moves: Move[];
     species: Ability;
-    sprites: Sprites;
+    sprites?: Sprites
     cries: Cries;
     stats: Stat[];
     types: Type[];
