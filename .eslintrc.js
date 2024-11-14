@@ -7,5 +7,21 @@ module.exports = {
     ],
     rules: {
       'prettier/prettier': 'error'
+    },
+    parserOptions: {
+      ecmaVersion: 2020,
+      sourceType: 'module'
+    },
+    env: {
+      browser: true,
+      node: true,
+      es6: true
+    },
+    settings: {
+      'import/resolver': {
+        node: {
+          extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue']
+        }
+      }
     }
 }

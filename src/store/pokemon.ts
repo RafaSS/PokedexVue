@@ -7,6 +7,7 @@ import type { PokemonDetails, PokemonList } from '../interfaces/Pokemon';
 export const usePokemonStore = defineStore('pokemon', () => {
   const pokemonList = ref<PokemonList | null>(null);
   const selectedPokemon = ref<PokemonDetails | null>(null);
+  const favoritePokemon = ref<PokemonDetails[]>([]);
 
   async function loadPokemonList(limit = 10, offset = 0) {
     pokemonList.value = await fetchPokemonList(limit, offset);
@@ -16,52 +17,41 @@ export const usePokemonStore = defineStore('pokemon', () => {
     selectedPokemon.value = await fetchPokemonDetails(name);
   }
 
-  async function saveFavoritePokemon(pokemon: PokemonDetails) {
-    // Save the favorite pokemon to the local storage
-    const favoritePokemon = localStorage.getItem('favoritePokemon');
-    if (favoritePokemon) {
-      const favoritePokemonList = JSON.parse(favoritePokemon);
-      favoritePokemonList.push(pokemon);
+  function saveFavoritePokemon(pokemon: PokemonDetails) {
+    const storedFavorites = localStorage.getItem('favoritePokemon');
+    const favoritePokemonList = storedFavorites ? JSON.parse(storedFavorites) : [];
+    favoritePokemonList.push(pokemon);
+    localStorage.setItem('favoritePokemon', JSON.stringify(favoritePokemonList));
+    favoritePokemon.value = favoritePokemonList;
+  }
+
+  function removeFavoritePokemon(name: string) {
+    const storedFavorites = localStorage.getItem('favoritePokemon');
+    if (storedFavorites) {
+      const favoritePokemonList = JSON.parse(storedFavorites).filter((pokemon: PokemonDetails) => pokemon.name !== name);
       localStorage.setItem('favoritePokemon', JSON.stringify(favoritePokemonList));
-    } else {
-      localStorage.setItem('favoritePokemon', JSON.stringify([pokemon]));
+      favoritePokemon.value = favoritePokemonList;
     }
   }
 
-  async function removeFavoritePokemon(name: string) {
-    const favoritePokemon = localStorage.getItem('favoritePokemon');
-    if (favoritePokemon) {
-      const favoritePokemonList = JSON.parse(favoritePokemon);
-      const newFavoritePokemonList = favoritePokemonList.filter((pokemon: PokemonDetails) => pokemon.name !== name);
-      localStorage.setItem('favoritePokemon', JSON.stringify(newFavoritePokemonList));
-    }
-  }
-
-  async function isFavoritePokemon(name: string) {
-    const favoritePokemon = localStorage.getItem('favoritePokemon');
-    if (favoritePokemon) {
-      const favoritePokemonList = JSON.parse(favoritePokemon);
+  function isFavoritePokemon(name: string): boolean {
+    const storedFavorites = localStorage.getItem('favoritePokemon');
+    if (storedFavorites) {
+      const favoritePokemonList = JSON.parse(storedFavorites);
       return favoritePokemonList.some((pokemon: PokemonDetails) => pokemon.name === name);
-    } else {
-      return false;
     }
+    return false;
   }
 
-  async function loadFavoritePokemon() {
-    const favoritePokemon = localStorage.getItem('favoritePokemon');
-    if (favoritePokemon) {
-      const favoritePokemonList = JSON.parse(favoritePokemon);
-      return favoritePokemonList;
-    } else {
-      return [];
-    }
+  function loadFavoritePokemon(): void {
+    const storedFavorites = localStorage.getItem('favoritePokemon');
+    favoritePokemon.value =  JSON.parse(storedFavorites || '[]');
   }
-
-
 
   return {
     pokemonList,
     selectedPokemon,
+    favoritePokemon,
     loadPokemonList,
     loadPokemonDetails,
     saveFavoritePokemon,
@@ -70,4 +60,3 @@ export const usePokemonStore = defineStore('pokemon', () => {
     isFavoritePokemon,
   };
 });
-

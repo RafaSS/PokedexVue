@@ -1,37 +1,35 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { fetchPokemonDetails } from '../api/pokemonApi';
 import { usePokemonStore } from '../store/pokemon';
 
 const router = useRouter();
 const pokemonList = ref<{ name: string }[]>([]);
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
-const totalPokemons = ref(0); // Will hold the total number of Pokémon to calculate pages
+const totalPokemons = ref(0);
 
 // Fetch Pokémon list for the current page
 const fetchPokemons = async () => {
-    const response = await usePokemonStore().loadFavoritePokemon();
-    
-    pokemonList.value = response;
-    console.log(pokemonList.value);
-    // totalPokemons.value = response.count;
+    const store = usePokemonStore();
+    await store.loadFavoritePokemon();
+    pokemonList.value = store.favoritePokemon;
+    totalPokemons.value = store.favoritePokemon.length;
 };
 
 // Handle next/previous page navigation
 const goToNextPage = () => {
-    // if (currentPage.value < Math.ceil(totalPokemons.value / itemsPerPage.value)) {
-    //     currentPage.value += 1;
-    //     fetchPokemons();
-    // }
+    if (currentPage.value < Math.ceil(totalPokemons.value / itemsPerPage.value)) {
+        currentPage.value += 1;
+        fetchPokemons();
+    }
 };
 
 const goToPreviousPage = () => {
-    // if (currentPage.value > 1) {
-    //     currentPage.value -= 1;
-    //     fetchPokemons();
-    // }
+    if (currentPage.value > 1) {
+        currentPage.value -= 1;
+        fetchPokemons();
+    }
 };
 
 // Load initial Pokémon list
@@ -46,9 +44,9 @@ const goToPokemonDetail = (name: string) => {
 <template>
     <!-- Navbar -->
     <nav class="bg-red-600 p-4 text-white flex justify-between items-center">
-        <h1 class="text-lg font-bold cursor-pointer">Pokedex</h1>
+        <h1 class="text-lg font-bold cursor-pointer" @click="router.push('/')">Pokedex</h1>
         <div class="flex space-x-4">
-            <button class="bg-red-600 text-red-600 px-3 py-1 rounded hover:bg-red-100" @click="router.push('/')">
+            <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-100" @click="router.push('/')">
                 Home
             </button>
             <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-100">
