@@ -70,7 +70,10 @@ const toggleFavorite = async () => {
   isFavorite.value = !isFavorite.value;
   if (isFavorite.value) {
     if (pokemonDetail.value) {
-      usePokemonStore().saveFavoritePokemon(pokemonDetail.value);
+      usePokemonStore().saveFavoritePokemon({
+        name: pokemonDetail.value.name,
+        url: pokemonDetail.value.species.url,
+      });
     }
   } else {
     usePokemonStore().removeFavoritePokemon(
