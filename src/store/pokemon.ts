@@ -5,6 +5,7 @@ import type { PokemonDetails } from '../interfaces/Pokemon';
 
 export const usePokemonStore = defineStore('pokemon', () => {
   const favoritePokemon = ref<PokemonDetails[]>([]);
+  const totalFavoritePokemon = ref(0);
 
   function saveFavoritePokemon(pokemon: PokemonDetails) {
     const storedFavorites = localStorage.getItem('favoritePokemon');
@@ -34,6 +35,7 @@ export const usePokemonStore = defineStore('pokemon', () => {
 
   function loadFavoritePokemon(page: number, pageSize: number): void {
     const storedFavorites = localStorage.getItem('favoritePokemon');
+    totalFavoritePokemon.value = storedFavorites ? JSON.parse(storedFavorites).length : 0;
     const favoritePokemonList = JSON.parse(storedFavorites || '[]');
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
@@ -46,5 +48,6 @@ export const usePokemonStore = defineStore('pokemon', () => {
     removeFavoritePokemon,
     loadFavoritePokemon,
     isFavoritePokemon,
+    totalFavoritePokemon,
   };
 });

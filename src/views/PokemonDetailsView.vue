@@ -10,7 +10,7 @@ import {
   EvolutionChain,
   PokemonDetails,
   PokemonSpecies,
-} from '@/interfaces/Pokemon';
+} from '../interfaces/Pokemon';
 import { usePokemonStore } from '../store/pokemon';
 
 const route = useRoute();
