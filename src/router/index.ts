@@ -6,7 +6,7 @@ import FavouritesView from '../views/FavouritesView.vue'
 const routes = [
   { path: '/', component: Home },
   { path: '/pokemondetail/:name', component: PokemonDetailsView },
-  { path: '/favourites', component: FavouritesView },
+  { path: '/favorites', component: FavouritesView },
 
 ]
 

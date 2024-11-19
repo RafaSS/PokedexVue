@@ -49,26 +49,14 @@ const goToPokemonDetail = (name: string) => {
 </script>
 
 <template>
-    <!-- Navbar -->
-    <nav class="bg-red-600 p-4 text-white flex justify-between items-center">
-        <h1 class="text-lg font-bold cursor-pointer" @click="router.push('/')">Favourites</h1>
-        <div class="flex space-x-4">
-            <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-100" @click="router.push('/')">
-                Home
-            </button>
-            <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-100">
-                Favorites
-            </button>
-        </div>
-    </nav>
 
     <!-- Pokémon List with Pagination -->
     <div class="max-w-2xl mx-auto p-5">
         <div class="bg-red-600 p-5 rounded-lg shadow-lg">
             <h2 class="text-xl font-semibold mb-4 text-white">Select a Pokémon:</h2>
             <ul class="space-y-2">
-                <li v-for="pokemon in pokemonList" :data-test="`pokemon-${pokemon.name}`" :key="pokemon.name" @click="goToPokemonDetail(pokemon.name)"
-                    class="cursor-pointer text-white hover:underline">
+                <li v-for="pokemon in pokemonList" :data-test="`pokemon-${pokemon.name}`" :key="pokemon.name"
+                    @click="goToPokemonDetail(pokemon.name)" class="cursor-pointer text-white hover:underline">
                     {{ pokemon.name }}
                 </li>
             </ul>

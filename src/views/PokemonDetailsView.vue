@@ -19,7 +19,6 @@ const pokemonDetail = ref<PokemonDetails>();
 const pokemonEvotion = ref<EvolutionChain>();
 const pokemonSpecies = ref<PokemonSpecies>();
 const isFavorite = ref(false);
-const currentPage = ref(1); // Added for pagination
 
 const loadData = async () => {
   pokemonDetail.value = await fetchPokemonDetails(route.params.name as string);
@@ -49,7 +48,7 @@ const goToEvolution = async (direction: 'next' | 'previous') => {
       );
       if (nextSpecies) {
         router.push(
-          `/pokemondetail/${nextSpecies}?page=${currentPage.value + 1}`,
+          `/pokemondetail/${nextSpecies}`,
         );
       }
     }
@@ -60,7 +59,7 @@ const goToEvolution = async (direction: 'next' | 'previous') => {
     );
     if (previousSpecies) {
       router.push(
-        `/pokemondetail/${previousSpecies}?page=${currentPage.value - 1}`,
+        `/pokemondetail/${previousSpecies}`,
       );
     }
   }
@@ -120,20 +119,7 @@ const extractEvolutionIdFromUrl = (url: string): number => {
 </script>
 
 <template>
-  <nav class="bg-gradient-to-r from-red-500 to-yellow-500 p-4 text-white flex justify-between items-center">
-    <h1 class="text-lg font-bold cursor-pointer" @click="goToEvolution('previous')">
-      Pokedex
-    </h1>
-    <div class="flex space-x-4">
-      <button class="bg-white text-red-500 px-3 py-1 rounded hover:bg-gray-200" @click="router.push('/')">
-        Home
-      </button>
-      <button class="bg-white text-red-500 px-3 py-1 rounded hover:bg-gray-200
-      " @click="router.push('/favourites')">
-        Favorites
-      </button>
-    </div>
-  </nav>
+
   <div class="relative max-w-md mx-auto p-5 border border-gray-300 rounded-lg shadow-md bg-red-500">
     <h1 class="text-2xl font-bold mb-4">{{ pokemonDetail?.name }}</h1>
     <div class="absolute top-2 right-2" @click="toggleFavorite">

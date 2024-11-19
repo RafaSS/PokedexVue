@@ -4,7 +4,7 @@ import vue from '@vitejs/plugin-vue';
 export default defineConfig({
   plugins: [vue()],
   optimizeDeps: {
-    include: ['axios'],
+    include: ['axios', 'vue-router','pinia'],
   },
   server: {
     proxy: {

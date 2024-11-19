@@ -1,14 +1,33 @@
-<!-- Navbar.vue -->
+<script>
+export default {
+  name: 'Navbar',
+  methods: {
+    navigateHome() {
+      this.$router.push('/');
+    },
+    navigateFavorites() {
+      this.$router.push('/favorites');
+    }
+  }
+}
+</script>
+
+
 <template>
-  <nav class="bg-blue-500 p-4 text-white">
-    <h1 class="text-lg font-bold">Pokedex</h1>
+  <nav class="bg-red-600 p-4 text-white flex justify-between items-center">
+    <h1 class="text-lg font-bold cursor-pointer" @click="navigateHome">Pokedex</h1>
+    <div class="flex space-x-4">
+      <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-100" @click="navigateHome">
+        Home
+      </button>
+      <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-100" @click="navigateFavorites">
+        Favorites
+      </button>
+    </div>
   </nav>
 </template>
 
-<script setup lang="ts">
-// Add any necessary imports or logic here
-</script>
 
 <style scoped>
-/* Optional: Style for Navbar */
+/* Add component-specific styles here */
 </style>
