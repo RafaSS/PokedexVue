@@ -107,18 +107,18 @@ const extractEvolutionIdFromUrl = (url: string): number => {
 </script>
 
 <template>
-  <div class="Frame3 w-[1920px] h-[1080px] relative bg-white">
+  <div class="w-full h-screen relative bg-white">
     <div
-      class="Card w-[1678px] h-[547px] p-6 left-[142px] top-[102px] absolute bg-[#3085c6] rounded-[27px] border border-[#d9d9d9] justify-start items-start gap-6 inline-flex">
-      <div class="Body grow shrink basis-0 h-[374px] flex-col justify-start items-start gap-4 inline-flex">
-        <div class="Marill self-stretch text-neutral-100 text-7xl font-bold font-['Inter'] leading-[86.40px]">
+      class="w-11/12 md:w-4/5 lg:w-3/4 h-auto p-6 mx-auto mt-8 relative bg-[#3085c6] rounded-[27px] border border-[#d9d9d9]">
+      <div class="flex flex-col justify-start items-start gap-4">
+        <div class="w-full text-neutral-100 text-3xl md:text-5xl lg:text-7xl font-bold font-['Inter'] leading-tight">
           {{ pokemonDetail?.name }}
         </div>
-        <div class="Frame2 w-96 grid grid-cols-2 gap-4">
+        <div class="w-full md:w-96 grid grid-cols-2 gap-4">
           <div v-for="stat in pokemonDetail?.stats" :key="stat.stat.name" class="col-span-1">
-            <div class="Hp left-0 top-0 text-black text-2xl font-semibold font-['Inter'] leading-[28.80px]">
+            <div class="text-black text-lg md:text-2xl font-semibold font-['Inter'] leading-relaxed">
               {{ stat.stat.name }}
-              <svg xmlns="http://www.w3.org/2000/svg" width="138" height="7" viewBox="0 0 138 7" fill="none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-2" viewBox="0 0 138 7" fill="none">
                 <path d="M3 4H135" stroke="#949494" stroke-width="6" stroke-linecap="round" />
                 <path :d="'M3 3.97861L' + (3 + stat.base_stat) + ' 3.9998'" stroke="white" stroke-width="6"
                   stroke-linecap="round" />
@@ -130,26 +130,23 @@ const extractEvolutionIdFromUrl = (url: string): number => {
     </div>
   </div>
 
-  <img class="Marill w-[1006px] h-[795px] left-[600px] top-[200px] absolute "
+  <img class="w-1/2 md:w-2/5 lg:w-1/3 h-auto absolute right-8 top-1/4 transform -translate-y-1/4"
     :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${pokemonDetail?.id}.svg`" />
 
-  <div class="Group1 w-[132px] h-[153px] left-[142px] top-[784px] absolute">
-    <img class="Image1 w-[90px] h-[81px] left-[21px] top-0 absolute shadow"
+  <div class="w-24 md:w-32 absolute left-4 md:left-8 bottom-8">
+    <img class="w-16 md:w-20 h-auto mx-auto shadow"
       :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${previousEvolutionDetail?.id}.svg`" />
-    <div
-      class="Button w-[132px] h-[52.47px] p-3 left-0 top-[100.53px] absolute bg-[#185fa0] rounded-lg justify-center items-center gap-2 inline-flex"
-      @click="goToEvolution('previous')">
-      <div class="Button text-neutral-100 text-base font-normal font-['Inter'] leading-none">
+    <div class="w-full p-3 mt-4 bg-[#185fa0] rounded-lg text-center cursor-pointer" @click="goToEvolution('previous')">
+      <div class="text-neutral-100 text-base font-normal font-['Inter']">
         < </div>
       </div>
     </div>
-    <div class="Group2 w-[134px] h-[170px] left-[1686px] top-[767px] absolute">
-      <img class="1 w-[114px] h-[116px] left-[3px] top-0 absolute shadow"
+
+    <div class="w-24 md:w-32 absolute right-4 md:right-8 bottom-8">
+      <img class="w-16 md:w-20 h-auto mx-auto shadow"
         :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${nextEvolutionDetail?.id}.svg`" />
-      <div
-        class="Button w-[134px] h-[51px] p-3 left-0 top-[119px] absolute bg-[#175ea0] rounded-lg justify-center items-center gap-2 inline-flex"
-        @click="goToEvolution('next')">
-        <div class="Button text-neutral-100 text-base font-normal font-['Inter'] leading-none">></div>
+      <div class="w-full p-3 mt-4 bg-[#175ea0] rounded-lg text-center cursor-pointer" @click="goToEvolution('next')">
+        <div class="text-neutral-100 text-base font-normal font-['Inter']">></div>
       </div>
     </div>
 </template>

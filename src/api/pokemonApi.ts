@@ -2,7 +2,7 @@ import axios from './axiosConfig.ts';
 import { PokemonList, PokemonDetails, EvolutionChain, PokemonSpecies } from '../interfaces/Pokemon.ts';
 
 export async function fetchPokemonList(limit: number, offset: number): Promise<PokemonList> {
-  const response = await axios.get(`/pokemon?limit=${limit}&offset=${offset}`);
+  const response = await axios.get(`/pokemon-species?limit=${limit}&offset=${offset}`);
   return response.data;
 }
 
