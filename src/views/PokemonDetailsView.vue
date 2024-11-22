@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import {
   fetchPokemonDetails,
   fetchPokemonEvolutionChain,
   fetchPokemonSpecies,
 } from '../api/pokemonApi';
+
+import PokemonStat from '../components/pokemon/PokemonStat.vue';
+import PokemonType from '../components/pokemon/PokemonType.vue';
+import PokemonNavigation from '../components/pokemon/PokemonNavigation.vue';
+// import PokemonNavButton from '../components/pokemon/PokemonNavigation.vue';
+// import PokemonEvolutionChain from '../components/pokemon/PokemonEvolutionChain.vue';
+
 import {
   EvolutionChain,
   PokemonDetails,
@@ -13,9 +20,12 @@ import {
 } from '../interfaces/Pokemon';
 import { usePokemonStore } from '../store/pokemon';
 
+
+
 const route = useRoute();
-const router = useRouter();
+// const router = useRouter();
 const pokemonDetail = ref<PokemonDetails>();
+const otherArtWork = ref<string[]>([]);
 const pokemonEvolution = ref<EvolutionChain>();
 const pokemonSpecies = ref<PokemonSpecies>();
 const isFavorite = ref(false);
@@ -25,6 +35,7 @@ const nextEvolutionDetail = ref<PokemonDetails>();
 const loadData = async () => {
   pokemonDetail.value = await fetchPokemonDetails(route.params.name as string);
   pokemonSpecies.value = await fetchPokemonSpecies(route.params.name as string);
+  otherArtWork.value = await getAltArtWork(pokemonDetail.value as PokemonDetails);
   pokemonEvolution.value = await fetchPokemonEvolutionChain(
     extractEvolutionIdFromUrl(
       pokemonSpecies.value?.evolution_chain.url as string,
@@ -33,6 +44,8 @@ const loadData = async () => {
   isFavorite.value = usePokemonStore().isFavoritePokemon(
     pokemonDetail.value.name as string,
   );
+
+
 
   const previousSpecies = findPreviousEvolution(
     pokemonEvolution.value?.chain,
@@ -57,19 +70,18 @@ onMounted(loadData);
 // Watch for changes in route parameter and reload data when it changes
 watch(() => route.params.name, loadData);
 
-const goToEvolution = async (direction: 'next' | 'previous') => {
-  if (direction === 'next') {
-    if (nextEvolutionDetail.value) {
-      router.push(`/pokemondetail/${nextEvolutionDetail.value.name}`);
-    }
-  } else if (direction === 'previous') {
-    if (previousEvolutionDetail.value) {
-      router.push(`/pokemondetail/${previousEvolutionDetail.value.name}`);
+
+const getAltArtWork = async (pokemon: PokemonDetails) => {
+  const otherArtWork: string[] = [];
+  if (!pokemon?.sprites?.other) return otherArtWork;
+  for (const key in pokemon?.sprites?.other) {
+    if (key !== 'official-artwork') {
+      const artwork = pokemon.sprites.other[key as keyof typeof pokemon.sprites.other];
+      otherArtWork.push(artwork.front_default);
     }
   }
+  return otherArtWork;
 };
-
-// Helper functions remain the same
 
 const findPreviousEvolution = (
   chain: any,
@@ -107,46 +119,42 @@ const extractEvolutionIdFromUrl = (url: string): number => {
 </script>
 
 <template>
-  <div class="w-full h-screen relative bg-white">
-    <div
-      class="w-11/12 md:w-4/5 lg:w-3/4 h-auto p-6 mx-auto mt-8 relative bg-[#3085c6] rounded-[27px] border border-[#d9d9d9]">
-      <div class="flex flex-col justify-start items-start gap-4">
-        <div class="w-full text-neutral-100 text-3xl md:text-5xl lg:text-7xl font-bold font-['Inter'] leading-tight">
-          {{ pokemonDetail?.name }}
-        </div>
-        <div class="w-full md:w-96 grid grid-cols-2 gap-4">
-          <div v-for="stat in pokemonDetail?.stats" :key="stat.stat.name" class="col-span-1">
-            <div class="text-black text-lg md:text-2xl font-semibold font-['Inter'] leading-relaxed">
-              {{ stat.stat.name }}
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-2" viewBox="0 0 138 7" fill="none">
-                <path d="M3 4H135" stroke="#949494" stroke-width="6" stroke-linecap="round" />
-                <path :d="'M3 3.97861L' + (3 + stat.base_stat) + ' 3.9998'" stroke="white" stroke-width="6"
-                  stroke-linecap="round" />
-              </svg>
+  <article class="flex overflow-hidden flex-col self-center px-20 py-8 bg-red-500 rounded-3xl max-md:px-5"
+    role="article" aria-labelledby="pokemon-name">
+    <section class="flex flex-col pt-3 pr-4 pb-0.5 pl-16 w-full bg-sky-600 rounded-3xl max-md:pl-5 max-md:max-w-full"
+      aria-label="Pokemon Information">
+      <div class="flex flex-col max-md:max-w-full">
+        <div class="flex gap-5 max-md:flex-col">
+          <div class="flex flex-col w-[43%] max-md:ml-0 max-md:w-full">
+            <div class="flex flex-col mt-1 w-full max-md:mt-4">
+              <h1 id="pokemon-name"
+                class="self-center ml-4 w-auto tracking-tighter leading-tight text-5xl text-center text-white max-md:ml-2.5 max-md:text-4xl">
+                {{ pokemonDetail?.name }}
+              </h1>
+              <div class="flex flex-wrap gap-12 items-start mt-5 min-h-[239px]">
+                <PokemonStat v-for="(stat, index) in pokemonDetail?.stats" :key="index" :label="stat.stat.name"
+                  :value="stat.base_stat" />
+              </div>
             </div>
+          </div>
+          <div class="flex flex-col ml-5 w-[57%] max-md:ml-0 max-md:w-full">
+            <img :src="pokemonDetail?.sprites?.other['official-artwork'].front_default"
+              :alt="`${pokemonDetail?.name} official artwork`"
+              class="object-contain grow mx-auto w-full aspect-[1.25] max-w-[442px] max-md:mt-3 max-md:max-w-full"
+              loading="lazy" />
           </div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <img class="w-1/2 md:w-2/5 lg:w-1/3 h-auto absolute right-8 top-1/4 transform -translate-y-1/4"
-    :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${pokemonDetail?.id}.svg`" />
-
-  <div class="w-24 md:w-32 absolute left-4 md:left-8 bottom-8">
-    <img class="w-16 md:w-20 h-auto mx-auto shadow"
-      :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${previousEvolutionDetail?.id}.svg`" />
-    <div class="w-full p-3 mt-4 bg-[#185fa0] rounded-lg text-center cursor-pointer" @click="goToEvolution('previous')">
-      <div class="text-neutral-100 text-base font-normal font-['Inter']">
-        < </div>
+      <div
+        class="flex gap-5 justify-between items-center ml-32 max-w-full text-xs font-bold leading-relaxed text-white whitespace-nowrap w-[111px] max-md:ml-2.5">
+        <PokemonType v-for="type in pokemonDetail?.types" :key="type.type.name" :type="type.type.name" />
       </div>
-    </div>
-
-    <div class="w-24 md:w-32 absolute right-4 md:right-8 bottom-8">
-      <img class="w-16 md:w-20 h-auto mx-auto shadow"
-        :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${nextEvolutionDetail?.id}.svg`" />
-      <div class="w-full p-3 mt-4 bg-[#175ea0] rounded-lg text-center cursor-pointer" @click="goToEvolution('next')">
-        <div class="text-neutral-100 text-base font-normal font-['Inter']">></div>
-      </div>
-    </div>
+    </section>
+    <nav class="flex flex-row pb-2.5 mx-auto mt-4 w-full max-w-full grow-0 max-md:pl-5" aria-label="Pokemon navigation">
+      <PokemonNavigation :previous="previousEvolutionDetail || ''" :next="nextEvolutionDetail || ''"
+        :other="otherArtWork " />
+    </nav>
+  </article>
 </template>
+<PokemonNavigation :previous="previousEvolutionDetail?.name || ''" :next="nextEvolutionDetail?.name || ''"
+  :other-art="otherArtWork || []" />
