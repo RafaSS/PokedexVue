@@ -20,8 +20,6 @@ import {
 } from '../interfaces/Pokemon';
 import { usePokemonStore } from '../store/pokemon';
 
-
-
 const route = useRoute();
 // const router = useRouter();
 const pokemonDetail = ref<PokemonDetails>();
@@ -45,8 +43,6 @@ const loadData = async () => {
     pokemonDetail.value.name as string,
   );
 
-
-
   const previousSpecies = findPreviousEvolution(
     pokemonEvolution.value?.chain,
     route.params.name as string,
@@ -69,7 +65,6 @@ onMounted(loadData);
 
 // Watch for changes in route parameter and reload data when it changes
 watch(() => route.params.name, loadData);
-
 
 const getAltArtWork = async (pokemon: PokemonDetails) => {
   const otherArtWork: string[] = [];
@@ -116,6 +111,16 @@ const extractEvolutionIdFromUrl = (url: string): number => {
   const match = url.match(/\/(\d+)\/?$/);
   return match ? parseInt(match[1], 10) : 0;
 };
+
+const toggleFavorite = () => {
+  const store = usePokemonStore();
+  if (isFavorite.value) {
+    store.removeFavoritePokemon(pokemonDetail.value?.name as string);
+  } else {
+    store.saveFavoritePokemon({name: pokemonDetail.value?.name as string, url: 'pokemon/' + pokemonDetail.value?.name});
+  }
+  isFavorite.value = !isFavorite.value;
+};
 </script>
 
 <template>
@@ -149,6 +154,9 @@ const extractEvolutionIdFromUrl = (url: string): number => {
         class="flex gap-5 justify-between items-center ml-32 max-w-full text-xs font-bold leading-relaxed text-white whitespace-nowrap w-[111px] max-md:ml-2.5">
         <PokemonType v-for="type in pokemonDetail?.types" :key="type.type.name" :type="type.type.name" />
       </div>
+      <button @click="toggleFavorite" class="mt-4 p-2 bg-yellow-500 text-white rounded">
+        {{ isFavorite ? 'Remove from Favorites' : 'Add to Favorites' }}
+      </button>
     </section>
     <nav class="flex flex-row pb-2.5 mx-auto mt-4 w-full max-w-full grow-0 max-md:pl-5" aria-label="Pokemon navigation">
       <PokemonNavigation :previous="previousEvolutionDetail || ''" :next="nextEvolutionDetail || ''"
@@ -156,5 +164,3 @@ const extractEvolutionIdFromUrl = (url: string): number => {
     </nav>
   </article>
 </template>
-<PokemonNavigation :previous="previousEvolutionDetail?.name || ''" :next="nextEvolutionDetail?.name || ''"
-  :other-art="otherArtWork || []" />
