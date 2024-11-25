@@ -63,14 +63,31 @@ watch(() => route.params.name, loadData);
 const getAltArtWork = async (pokemon: PokemonDetails) => {
   const otherArtWork: string[] = [];
   if (!pokemon?.sprites?.other) return otherArtWork;
-  for (const key in pokemon?.sprites?.other) {
+  for (const key in pokemon.sprites.other) {
     if (key !== 'official-artwork') {
       const artwork = pokemon.sprites.other[key as keyof typeof pokemon.sprites.other];
-      otherArtWork.push(artwork.front_default);
+      if (artwork.front_default) {
+        otherArtWork.push(artwork.front_default);
+      }
+    }
+  }
+  if (!pokemon.sprites.versions) return otherArtWork;
+  for (const key in pokemon.sprites.versions) {
+    if (key !== 'generation-viii') {
+      const version = pokemon.sprites.versions[key as keyof typeof pokemon.sprites.versions];
+      for (const subKey in version) {
+        if (subKey !== 'icons') {
+          const artwork = version[subKey as keyof typeof version] as { front_default?: string };
+          if (artwork.front_default) {
+            otherArtWork.push(artwork.front_default);
+          }
+        }
+      }
     }
   }
   return otherArtWork;
 };
+
 
 const findPreviousEvolution = (
   chain: any,
@@ -111,7 +128,7 @@ const toggleFavorite = () => {
   if (isFavorite.value) {
     store.removeFavoritePokemon(pokemonDetail.value?.name as string);
   } else {
-    store.saveFavoritePokemon({name: pokemonDetail.value?.name as string, url: 'pokemon/' + pokemonDetail.value?.name});
+    store.saveFavoritePokemon({ name: pokemonDetail.value?.name as string, url: 'pokemon/' + pokemonDetail.value?.name });
   }
   isFavorite.value = !isFavorite.value;
 };
@@ -120,7 +137,8 @@ const toggleFavorite = () => {
 <template>
   <article class="flex overflow-hidden flex-col self-center px-20 py-8 bg-red-500 rounded-3xl max-md:px-5"
     role="article" aria-labelledby="pokemon-name">
-    <section class="relative flex flex-col pt-3 pr-4 pb-0.5 pl-16 w-full bg-sky-600 rounded-3xl max-md:pl-5 max-md:max-w-full"
+    <section
+      class="relative flex flex-col pt-3 pr-4 pb-0.5 pl-16 w-full bg-sky-600 rounded-3xl max-md:pl-5 max-md:max-w-full"
       aria-label="Pokemon Information">
       <div class="absolute top-4 right-4 cursor-pointer" @click="toggleFavorite">
         <img v-if="isFavorite" src="../assets/star.svg" alt="Remove from Favorites" class="w-8 h-8" />
@@ -155,7 +173,7 @@ const toggleFavorite = () => {
     </section>
     <nav class="flex flex-row pb-2.5 mx-auto mt-4 w-full max-w-full grow-0 max-md:pl-5" aria-label="Pokemon navigation">
       <PokemonNavigation :previous="previousEvolutionDetail || ''" :next="nextEvolutionDetail || ''"
-        :other="otherArtWork " />
+        :other="otherArtWork" />
     </nav>
   </article>
 </template>
