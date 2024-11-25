@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import { usePokemonStore } from '../store/pokemon';
 
 const router = useRouter();
-const pokemonList = ref<{ name: string }[]>([]);
+const pokemonList = ref<{ name: string, sprite: string }[]>([]);
 const store = usePokemonStore();
 const currentPage = computed(() => store.currentPage);
 const itemsPerPage = ref(10);
@@ -14,12 +14,12 @@ const totalPokemons = ref(0);
 defineExpose({ currentPage, itemsPerPage, totalPokemons });
 
 // Fetch Pokémon list for the current page
-
-
-// Load data function
 const loadData = () => {
     store.loadFavoritePokemon(currentPage.value, itemsPerPage.value);
-    pokemonList.value = store.favoritePokemon;
+    pokemonList.value = store.favoritePokemon.map(pokemon => ({
+        name: pokemon.name,
+        sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`
+    }));
     totalPokemons.value = store.totalFavoritePokemon;
 };
 
@@ -49,17 +49,17 @@ const goToPokemonDetail = (name: string) => {
 </script>
 
 <template>
-
     <!-- Pokémon List with Pagination -->
     <div class="max-w-2xl mx-auto p-5">
         <div class="bg-red-600 p-5 rounded-lg shadow-lg">
             <h2 class="text-xl font-semibold mb-4 text-white">Select a Pokémon:</h2>
-            <ul class="space-y-2">
-                <li v-for="pokemon in pokemonList" :data-test="`pokemon-${pokemon.name}`" :key="pokemon.name"
-                    @click="goToPokemonDetail(pokemon.name)" class="cursor-pointer text-white hover:underline">
-                    {{ pokemon.name }}
-                </li>
-            </ul>
+            <div class="grid grid-cols-2 gap-4">
+                <div v-for="pokemon in pokemonList" :key="pokemon.name" @click="goToPokemonDetail(pokemon.name)"
+                    class="cursor-pointer text-white hover:underline col items-center  p-2 rounded-lg shadow-md">
+                    <img :src="pokemon.sprite" alt="pokemon" >
+                    <span>{{ pokemon.name }}</span>
+                </div>
+            </div>
 
             <!-- Pagination Controls -->
             <div class="flex justify-between items-center mt-6">
@@ -80,4 +80,10 @@ const goToPokemonDetail = (name: string) => {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+</style>

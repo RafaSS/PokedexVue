@@ -6,6 +6,7 @@ export interface PokemonList {
 }
 
 export interface FavouritePokemon {
+  id: number;
   name: string;
   url: string;
 }

@@ -128,7 +128,7 @@ const toggleFavorite = () => {
   if (isFavorite.value) {
     store.removeFavoritePokemon(pokemonDetail.value?.name as string);
   } else {
-    store.saveFavoritePokemon({ name: pokemonDetail.value?.name as string, url: 'pokemon/' + pokemonDetail.value?.name });
+    store.saveFavoritePokemon({ id: pokemonDetail.value?.id as number, name: pokemonDetail.value?.name as string, url: 'pokemon/' + pokemonDetail.value?.name });
   }
   isFavorite.value = !isFavorite.value;
 };
