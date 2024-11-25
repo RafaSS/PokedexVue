@@ -10,8 +10,6 @@ import {
 import PokemonStat from '../components/pokemon/PokemonStat.vue';
 import PokemonType from '../components/pokemon/PokemonType.vue';
 import PokemonNavigation from '../components/pokemon/PokemonNavigation.vue';
-// import PokemonNavButton from '../components/pokemon/PokemonNavigation.vue';
-// import PokemonEvolutionChain from '../components/pokemon/PokemonEvolutionChain.vue';
 
 import {
   EvolutionChain,
@@ -21,7 +19,6 @@ import {
 import { usePokemonStore } from '../store/pokemon';
 
 const route = useRoute();
-// const router = useRouter();
 const pokemonDetail = ref<PokemonDetails>();
 const otherArtWork = ref<string[]>([]);
 const pokemonEvolution = ref<EvolutionChain>();
@@ -60,10 +57,7 @@ const loadData = async () => {
   }
 };
 
-// Call loadData on component mount
 onMounted(loadData);
-
-// Watch for changes in route parameter and reload data when it changes
 watch(() => route.params.name, loadData);
 
 const getAltArtWork = async (pokemon: PokemonDetails) => {
@@ -126,8 +120,12 @@ const toggleFavorite = () => {
 <template>
   <article class="flex overflow-hidden flex-col self-center px-20 py-8 bg-red-500 rounded-3xl max-md:px-5"
     role="article" aria-labelledby="pokemon-name">
-    <section class="flex flex-col pt-3 pr-4 pb-0.5 pl-16 w-full bg-sky-600 rounded-3xl max-md:pl-5 max-md:max-w-full"
+    <section class="relative flex flex-col pt-3 pr-4 pb-0.5 pl-16 w-full bg-sky-600 rounded-3xl max-md:pl-5 max-md:max-w-full"
       aria-label="Pokemon Information">
+      <div class="absolute top-4 right-4 cursor-pointer" @click="toggleFavorite">
+        <img v-if="isFavorite" src="../assets/star.svg" alt="Remove from Favorites" class="w-8 h-8" />
+        <img v-else src="../assets/starDisabled.svg" alt="Add to Favorites" class="w-8 h-8" />
+      </div>
       <div class="flex flex-col max-md:max-w-full">
         <div class="flex gap-5 max-md:flex-col">
           <div class="flex flex-col w-[43%] max-md:ml-0 max-md:w-full">
@@ -154,9 +152,6 @@ const toggleFavorite = () => {
         class="flex gap-5 justify-between items-center ml-32 max-w-full text-xs font-bold leading-relaxed text-white whitespace-nowrap w-[111px] max-md:ml-2.5">
         <PokemonType v-for="type in pokemonDetail?.types" :key="type.type.name" :type="type.type.name" />
       </div>
-      <button @click="toggleFavorite" class="mt-4 p-2 bg-yellow-500 text-white rounded">
-        {{ isFavorite ? 'Remove from Favorites' : 'Add to Favorites' }}
-      </button>
     </section>
     <nav class="flex flex-row pb-2.5 mx-auto mt-4 w-full max-w-full grow-0 max-md:pl-5" aria-label="Pokemon navigation">
       <PokemonNavigation :previous="previousEvolutionDetail || ''" :next="nextEvolutionDetail || ''"
