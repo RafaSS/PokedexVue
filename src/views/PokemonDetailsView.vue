@@ -141,7 +141,7 @@ const updateSelectedImage = (image: string) => {
 </script>
 
 <template>
-  <article class="flex overflow-hidden flex-col self-center px-20 py-8 bg-red-500 rounded-3xl max-md:px-5 md:m-24"
+  <article class="flex overflow-hidden flex-col self-center px-20 py-8 bg-red-500 rounded-3xl max-md:px-5 md:m-20"
     role="article" aria-labelledby="pokemon-name">
     <section
       class="relative flex flex-col pt-3 pr-4 pb-0.5 pl-16 w-full bg-sky-600 rounded-3xl max-md:pl-5 max-md:max-w-full"
@@ -165,8 +165,7 @@ const updateSelectedImage = (image: string) => {
             </div>
           </div>
           <div class="flex flex-col ml-5 w-[57%] max-md:ml-0 max-md:w-full">
-            <img :src="selectedImage"
-              :alt="`${pokemonDetail?.name} official artwork`"
+            <img :src="selectedImage" :alt="`${pokemonDetail?.name} official artwork`"
               class="object-contain grow mx-auto w-full aspect-[1.25] max-w-[442px] max-md:mt-3 max-md:max-w-full"
               loading="lazy" style="image-rendering: pixelated;" />
           </div>

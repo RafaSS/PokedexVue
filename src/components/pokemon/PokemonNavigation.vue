@@ -49,10 +49,10 @@ const selectImage = (image: string) => {
       <button v-if="previous" @click="router.push(`/pokemondetail/${previous.name}`)" class="flex flex-col items-center"
         :aria-label="previous ? `Go to ${previous.name}` : 'Go to previous'">
         <img v-if="previous" :src="previous.sprites?.other['official-artwork'].front_default"
-          class="object-contain aspect-[1.11] w-[90px]" />
+        class="object-contain aspect-[1.11] w-[90px] transition-transform transform hover:scale-110" />
         <div
-          class="overflow-hidden flex-1 shrink gap-2 px-4 py-2 mt-5 bg-sky-700 h-auto min-h-[60px] rounded-full w-auto min-w-[60px] text-white text-3xl font-bold">
-          &lt;
+        class="overflow-hidden flex-1 shrink gap-2 px-4 py-2 mt-5 bg-sky-700 h-auto min-h-[60px] rounded-full w-auto min-w-[60px] text-white text-3xl font-bold">
+        &lt;
         </div>
       </button>
 
@@ -65,26 +65,27 @@ const selectImage = (image: string) => {
           &lt;
         </div>
       </button>
-      <div class="col">
-        <div class=" text-lg font-bold">Alternative Images</div>
-        <div class="flex gap-1 items-center" role="navigation" aria-label="Alternative Carousel">
+      <div class="col w-full md:w-auto">
+        <div class="text-lg font-bold text-center md:text-left">Alternative Images</div>
+        <div class="flex gap-1 items-center justify-center md:justify-start" role="navigation" aria-label="Alternative Carousel">
           <button @click="prevImage" class="overflow-hidden px-1 py-1.5 rounded-lg bg-red-500"
-            aria-label="Previous Alternative">&lt;</button>
+        aria-label="Previous Alternative">&lt;</button>
           <div class="flex gap-1">
-            <img v-for="(image, index) in visibleImages" :key="index" :src="image" alt="Alternative Image"
-              class="object-contain w-10 rounded-full aspect-square" @click="selectImage(image)" />
+        <img v-for="(image, index) in visibleImages" :key="index" :src="image" alt="Alternative Image"
+          class="object-contain cursor-pointer w-10 rounded-full aspect-square transition-transform transform hover:scale-110"
+          @click="selectImage(image)" style="background-color: transparent;" />
           </div>
           <button @click="nextImage" class="overflow-hidden px-1 py-1.5 rounded-lg bg-red-500"
-            aria-label="Next Alternative">&gt;</button>
+        aria-label="Next Alternative">&gt;</button>
         </div>
       </div>
 
       <button v-if="next" @click="router.push(`/pokemondetail/${next.name}`)" class="flex flex-col items-center"
         :aria-label="`Go to ${(next as PokemonDetails).name}`">
         <img :src="next.sprites?.other['official-artwork'].front_default"
-          class="object-contain aspect-[0.98] w-[114px]" />
+          class="object-contain aspect-[0.98] w-[114px] transition-transform transform hover:scale-110" />
         <div
-          class="overflow-hidden flex-1  gap-2 px-4 py-2 bg-sky-700 h-[60px] min-h-[60px] rounded-full w-[60px] text-white text-3xl font-bold">
+          class="overflow-hidden flex-1  gap-2 px-4 py-2 bg-sky-700 h-[60px] min-h-[60px] rounded-full w-[60px] text-white text-3xl font-bold transition-transform transform hover:scale-110">
           <p>&gt;</p>
         </div>
       </button>
@@ -92,9 +93,9 @@ const selectImage = (image: string) => {
       <button v-else class="flex flex-col items-center" aria-label="Next evolution">
         <img
           src="https://cdn.builder.io/api/v1/image/assets/6d68e11debc844a1ade269bfeb7cc3c0/1aa5f61aa7172c587cc8d8c12cddf81a213ce9ea26d9990faeb6151aca9c6fe6?apiKey=6d68e11debc844a1ade269bfeb7cc3c0&"
-          class="object-contain aspect-[0.98] w-[114px]" />
+          class="object-contain aspect-[0.98] w-[114px] transition-transform transform hover:scale-110" />
         <div
-          class="overflow-hidden flex-1 shrink gap-2 px-4 py-2 bg-sky-700 h-[60px] min-h-[60px] rounded-full w-[60px] text-white text-3xl font-bold">
+          class="overflow-hidden flex-1 shrink gap-2 px-4 py-2 bg-sky-700 h-[60px] min-h-[60px] rounded-full w-[60px] text-white text-3xl font-bold ">
           &gt;
         </div>
       </button>
