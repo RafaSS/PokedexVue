@@ -26,6 +26,7 @@ const pokemonSpecies = ref<PokemonSpecies>();
 const isFavorite = ref(false);
 const previousEvolutionDetail = ref<PokemonDetails>();
 const nextEvolutionDetail = ref<PokemonDetails>();
+const selectedImage = ref<string | undefined>(undefined);
 
 const loadData = async () => {
   pokemonDetail.value = await fetchPokemonDetails(route.params.name as string);
@@ -55,6 +56,8 @@ const loadData = async () => {
   if (nextSpecies) {
     nextEvolutionDetail.value = await fetchPokemonDetails(nextSpecies);
   }
+
+  selectedImage.value = pokemonDetail.value?.sprites?.other['official-artwork'].front_default || undefined;
 };
 
 onMounted(loadData);
@@ -87,7 +90,6 @@ const getAltArtWork = async (pokemon: PokemonDetails) => {
   }
   return otherArtWork;
 };
-
 
 const findPreviousEvolution = (
   chain: any,
@@ -132,6 +134,10 @@ const toggleFavorite = () => {
   }
   isFavorite.value = !isFavorite.value;
 };
+
+const updateSelectedImage = (image: string) => {
+  selectedImage.value = image;
+};
 </script>
 
 <template>
@@ -159,10 +165,10 @@ const toggleFavorite = () => {
             </div>
           </div>
           <div class="flex flex-col ml-5 w-[57%] max-md:ml-0 max-md:w-full">
-            <img :src="pokemonDetail?.sprites?.other['official-artwork'].front_default"
+            <img :src="selectedImage"
               :alt="`${pokemonDetail?.name} official artwork`"
               class="object-contain grow mx-auto w-full aspect-[1.25] max-w-[442px] max-md:mt-3 max-md:max-w-full"
-              loading="lazy" />
+              loading="lazy" style="image-rendering: pixelated;" />
           </div>
         </div>
       </div>
@@ -173,7 +179,7 @@ const toggleFavorite = () => {
     </section>
     <nav class="flex flex-row pb-2.5 mx-auto mt-4 w-full max-w-full grow-0 max-md:pl-5" aria-label="Pokemon navigation">
       <PokemonNavigation :previous="previousEvolutionDetail || ''" :next="nextEvolutionDetail || ''"
-        :other="otherArtWork" />
+        :other="otherArtWork" @selectImage="updateSelectedImage" />
     </nav>
   </article>
 </template>

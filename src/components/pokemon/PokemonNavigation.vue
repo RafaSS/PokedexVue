@@ -11,8 +11,9 @@ const props = defineProps<{
   other: string[];
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'navigate', direction: 'previous' | 'next'): void;
+  (e: 'selectImage', image: string): void;
 }>();
 
 const currentIndex = ref(0);
@@ -36,6 +37,10 @@ const prevImage = () => {
 const visibleImages = computed(() => {
   return props.other.slice(currentIndex.value, currentIndex.value + 3);
 });
+
+const selectImage = (image: string) => {
+  emit('selectImage', image);
+};
 </script>
 
 <template>
@@ -67,7 +72,7 @@ const visibleImages = computed(() => {
             aria-label="Previous Alternative">&lt;</button>
           <div class="flex gap-1">
             <img v-for="(image, index) in visibleImages" :key="index" :src="image" alt="Alternative Image"
-              class="object-contain w-10 rounded-full aspect-square" />
+              class="object-contain w-10 rounded-full aspect-square" @click="selectImage(image)" />
           </div>
           <button @click="nextImage" class="overflow-hidden px-1 py-1.5 rounded-lg bg-red-500"
             aria-label="Next Alternative">&gt;</button>
