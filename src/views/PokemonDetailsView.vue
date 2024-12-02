@@ -135,7 +135,7 @@ const toggleFavorite = () => {
 </script>
 
 <template>
-  <article class="flex overflow-hidden flex-col self-center px-20 py-8 bg-red-500 rounded-3xl max-md:px-5"
+  <article class="flex overflow-hidden flex-col self-center px-20 py-8 bg-red-500 rounded-3xl max-md:px-5 md:m-24"
     role="article" aria-labelledby="pokemon-name">
     <section
       class="relative flex flex-col pt-3 pr-4 pb-0.5 pl-16 w-full bg-sky-600 rounded-3xl max-md:pl-5 max-md:max-w-full"
