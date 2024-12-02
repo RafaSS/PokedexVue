@@ -46,8 +46,9 @@ const visibleImages = computed(() => {
         <img v-if="previous" :src="previous.sprites?.other['official-artwork'].front_default"
           class="object-contain aspect-[1.11] w-[90px]" />
         <div
-          class="overflow-hidden flex-1 shrink gap-2 px-3 mt-5 bg-sky-700 h-[60px] min-h-[60px] rounded-[100px] w-[60px] text-white text-3xl font-bold">
-          &lt;-</div>
+          class="overflow-hidden flex-1 shrink gap-2 px-4 py-2 mt-5 bg-sky-700 h-auto min-h-[60px] rounded-full w-auto min-w-[60px] text-white text-3xl font-bold">
+          &lt;
+        </div>
       </button>
 
       <button v-else class="flex flex-col items-center" aria-label="Previous evolution">
@@ -55,20 +56,21 @@ const visibleImages = computed(() => {
           src="https://cdn.builder.io/api/v1/image/assets/6d68e11debc844a1ade269bfeb7cc3c0/1aa5f61aa7172c587cc8d8c12cddf81a213ce9ea26d9990faeb6151aca9c6fe6?apiKey=6d68e11debc844a1ade269bfeb7cc3c0&"
           class="object-contain aspect-[1.11] w-[90px]" />
         <div
-          class="overflow-hidden flex-1 shrink gap-2 px-3 mt-5 bg-sky-700 h-[60px] min-h-[60px] rounded-[100px] w-[60px] text-white text-3xl font-bold">
-          &lt;-</div>
+          class="overflow-hidden flex-1 shrink gap-2 px-4 py-2 mt-5 bg-sky-700 h-[60px] min-h-[60px] rounded-full w-[60px] text-white text-3xl font-bold">
+          &lt;
+        </div>
       </button>
       <div class="col">
         <div class=" text-lg font-bold">Alternative Images</div>
         <div class="flex gap-1 items-center" role="navigation" aria-label="Alternative Carousel">
           <button @click="prevImage" class="overflow-hidden px-1 py-1.5 rounded-lg bg-red-500"
-            aria-label="Previous Alternative">&lt;-</button>
+            aria-label="Previous Alternative">&lt;</button>
           <div class="flex gap-1">
             <img v-for="(image, index) in visibleImages" :key="index" :src="image" alt="Alternative Image"
               class="object-contain w-10 rounded-full aspect-square" />
           </div>
           <button @click="nextImage" class="overflow-hidden px-1 py-1.5 rounded-lg bg-red-500"
-            aria-label="Next Alternative">-&gt;</button>
+            aria-label="Next Alternative">&gt;</button>
         </div>
       </div>
 
@@ -77,8 +79,9 @@ const visibleImages = computed(() => {
         <img :src="next.sprites?.other['official-artwork'].front_default"
           class="object-contain aspect-[0.98] w-[114px]" />
         <div
-          class="overflow-hidden flex-1 shrink gap-2 px-3 bg-sky-700 h-[60px] min-h-[60px] rounded-[100px] w-[60px] text-white text-3xl font-bold">
-          -&gt;</div>
+          class="overflow-hidden flex-1  gap-2 px-4 py-2 bg-sky-700 h-[60px] min-h-[60px] rounded-full w-[60px] text-white text-3xl font-bold">
+          <p>&gt;</p>
+        </div>
       </button>
 
       <button v-else class="flex flex-col items-center" aria-label="Next evolution">
@@ -86,8 +89,9 @@ const visibleImages = computed(() => {
           src="https://cdn.builder.io/api/v1/image/assets/6d68e11debc844a1ade269bfeb7cc3c0/1aa5f61aa7172c587cc8d8c12cddf81a213ce9ea26d9990faeb6151aca9c6fe6?apiKey=6d68e11debc844a1ade269bfeb7cc3c0&"
           class="object-contain aspect-[0.98] w-[114px]" />
         <div
-          class="overflow-hidden flex-1 shrink gap-2 px-3 bg-sky-700 h-[60px] min-h-[60px] rounded-[100px] w-[60px] text-white text-3xl font-bold">
-          -&gt;</div>
+          class="overflow-hidden flex-1 shrink gap-2 px-4 py-2 bg-sky-700 h-[60px] min-h-[60px] rounded-full w-[60px] text-white text-3xl font-bold">
+          &gt;
+        </div>
       </button>
     </div>
   </div>

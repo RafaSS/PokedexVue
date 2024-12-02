@@ -53,9 +53,9 @@ const goToPokemonDetail = (name: string) => {
     <div class="max-w-2xl mx-auto p-5">
         <div class="bg-red-600 p-5 rounded-lg shadow-lg">
             <h2 class="text-xl font-semibold mb-4 text-white">Select a Pokémon:</h2>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-4 m-24">
                 <div v-for="pokemon in pokemonList" :key="pokemon.name" @click="goToPokemonDetail(pokemon.name)"
-                    class="cursor-pointer text-white hover:underline col items-center  p-2 rounded-lg shadow-md">
+                    class="cursor-pointer text-white hover:underline col items-center w-auto p-2 rounded-lg shadow-md">
                     <img :src="pokemon.sprite" alt="pokemon" >
                     <span>{{ pokemon.name }}</span>
                 </div>
