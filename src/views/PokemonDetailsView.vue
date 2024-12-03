@@ -91,7 +91,7 @@ const getAltArtWork = async (pokemon: PokemonDetails) => {
   for (const key in pokemon.sprites.other) {
     if (key !== 'official-artwork') {
       const artwork = pokemon.sprites.other[key as keyof typeof pokemon.sprites.other];
-      if (artwork.front_default) {
+      if (artwork.front_default && !artwork.front_default.endsWith('.jpg')) {
         otherArtWork.push(artwork.front_default);
       }
     }
@@ -103,7 +103,7 @@ const getAltArtWork = async (pokemon: PokemonDetails) => {
       for (const subKey in version) {
         if (subKey !== 'icons') {
           const artwork = version[subKey as keyof typeof version] as { front_default?: string };
-          if (artwork.front_default) {
+          if (artwork.front_default && !artwork.front_default.endsWith('.jpg')) {
             otherArtWork.push(artwork.front_default);
           }
         }
@@ -163,7 +163,7 @@ const updateSelectedImage = (image: string) => {
 </script>
 
 <template>
-  <article class="flex overflow-hidden flex-col self-center px-20 py-8 bg-red-500 rounded-3xl max-md:px-5 md:m-20"
+  <article class="flex overflow-hidden flex-col self-center px-20 py-8 bg-red-500 rounded-3xl max-md:px-5 md:ml-20 md:mr-20 mt-10"
     role="article" aria-labelledby="pokemon-name">
     <section
       class="relative flex flex-col pt-3 pr-4 pb-0.5 pl-16 w-full bg-sky-600 rounded-3xl max-md:pl-5 max-md:max-w-full"
