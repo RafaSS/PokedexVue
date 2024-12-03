@@ -4,20 +4,9 @@ import type { FavouritePokemon } from '../interfaces/Pokemon';
 export const usePokemonStore = defineStore('pokemonStore', {
   state: () => ({
     favoritePokemon: [] as FavouritePokemon[], // List of favorite Pokémon
-    currentPage: 1,
-    itemsPerPage: 10,
     totalFavoritePokemon: localStorage.getItem('favoritePokemon') ? JSON.parse(localStorage.getItem('favoritePokemon') || '[]').length : 0,
   }),
-  getters: {
-    paginatedFavoritePokemon(state) {
-      const start = (state.currentPage - 1) * state.itemsPerPage;
-      const end = start + state.itemsPerPage;
-      return state.favoritePokemon.slice(start, end);
-    },
-    totalPages(state) {
-      return Math.ceil(state.favoritePokemon.length / state.itemsPerPage);
-    },
-  },
+  getters: {},
   actions: {
     saveFavoritePokemon(pokemon: FavouritePokemon) {
       const storedFavorites = localStorage.getItem('favoritePokemon');
@@ -51,12 +40,6 @@ export const usePokemonStore = defineStore('pokemonStore', {
       const start = (page - 1) * pageSize;
       const end = start + pageSize;
       this.favoritePokemon = favoritePokemonList.slice(start, end);
-    },
-    changePage(page: number) {
-      if (page > 0 && page <= this.totalPages) {
-        this.currentPage = page;
-        this.loadFavoritePokemon(page, this.itemsPerPage);
-      }
     }
   }
 });

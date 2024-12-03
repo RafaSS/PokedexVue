@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { usePokemonStore } from '../store/pokemon';
 
 const router = useRouter();
 const pokemonList = ref<{ name: string, sprite: string }[]>([]);
 const store = usePokemonStore();
-const currentPage = computed(() => store.currentPage);
+const currentPage = ref(1);
 const itemsPerPage = ref(10);
 const totalPokemons = ref(0);
 
-// Expose currentPage and itemsPerPage to parent component
-defineExpose({ currentPage, itemsPerPage, totalPokemons });
+const capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+};
 
 const loadData = () => {
     store.loadFavoritePokemon(currentPage.value, itemsPerPage.value);
@@ -22,19 +23,19 @@ const loadData = () => {
     totalPokemons.value = store.totalFavoritePokemon;
 };
 
-const goToNextPage = async () => {
-    if (store.currentPage < Math.ceil(totalPokemons.value / itemsPerPage.value)) {
-        store.changePage(store.currentPage + 1);
+const goToNextPage = () => {
+    if (currentPage.value < Math.ceil(totalPokemons.value / itemsPerPage.value)) {
+        currentPage.value += 1;
+        loadData();
     }
 };
 
-const goToPreviousPage = async () => {
-    if (store.currentPage > 1) {
-        store.changePage(store.currentPage - 1);
+const goToPreviousPage = () => {
+    if (currentPage.value > 1) {
+        currentPage.value -= 1;
+        loadData();
     }
 };
-
-watch([currentPage, itemsPerPage], loadData);
 
 onMounted(loadData);
 
@@ -51,7 +52,7 @@ const goToPokemonDetail = (name: string) => {
                 <div v-for="pokemon in pokemonList" :key="pokemon.name" @click="goToPokemonDetail(pokemon.name)"
                     class="cursor-pointer bg-red-600 text-white hover:underline inline-block items-center p-2 rounded-lg shadow-md text-center">
                     <img class="m-auto" :src="pokemon.sprite" alt="pokemon">
-                    <span>{{ pokemon.name }}</span>
+                    <span>{{ capitalizeFirstLetter(pokemon.name) }}</span>
                 </div>
             </div>
 

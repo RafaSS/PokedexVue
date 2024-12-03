@@ -5,6 +5,7 @@ import {
   fetchPokemonDetails,
   fetchPokemonEvolutionChain,
   fetchPokemonSpecies,
+  fetchTypeDetails,
 } from '../api/pokemonApi';
 
 import PokemonStat from '../components/pokemon/PokemonStat.vue';
@@ -27,6 +28,7 @@ const isFavorite = ref(false);
 const previousEvolutionDetail = ref<PokemonDetails>();
 const nextEvolutionDetail = ref<PokemonDetails>();
 const selectedImage = ref<string | undefined>(undefined);
+const weaknesses = ref<string[]>([]);
 
 const loadData = async () => {
   pokemonDetail.value = await fetchPokemonDetails(route.params.name as string);
@@ -45,6 +47,22 @@ const loadData = async () => {
     pokemonEvolution.value?.chain,
     route.params.name as string,
   );
+
+  const halfDamage = new Set<string>();
+  const doubleDamage = new Set<string>();
+
+  for (const type of pokemonDetail.value?.types || []) {
+    const typeDetails = await fetchTypeDetails(type.type.name);
+    for (const damageRelation of typeDetails.damage_relations.double_damage_from) {
+      doubleDamage.add(damageRelation.name);
+    }
+    for (const damageRelation of typeDetails.damage_relations.half_damage_from) {
+      halfDamage.add(damageRelation.name);
+    }
+    //weakness is the diference between double damage and half damage
+    weaknesses.value = Array.from(doubleDamage).filter((type) => !halfDamage.has(type));
+  }
+
   const nextSpecies = findNextEvolution(
     pokemonEvolution.value?.chain,
     route.params.name as string,
@@ -148,7 +166,7 @@ const updateSelectedImage = (image: string) => {
       aria-label="Pokemon Information">
       <div class="absolute top-4 right-4 cursor-pointer" @click="toggleFavorite">
         <img v-if="isFavorite" src="../assets/star.svg" alt="Remove from Favorites" class="w-8 h-8" />
-        <img v-else src="../assets/starDisabled.svg" alt="Add to Favorites" class="w-8 h-8" />
+        <img v-else src="../assets/starDisabledg" alt="Add to Favorites" class="w-8 h-8" />
       </div>
       <div class="flex flex-col max-md:max-w-full">
         <div class="flex gap-5 max-md:flex-col">
@@ -171,9 +189,19 @@ const updateSelectedImage = (image: string) => {
           </div>
         </div>
       </div>
-      <div
-        class="flex gap-5 justify-between items-center ml-32 max-w-full text-xs font-bold leading-relaxed text-white whitespace-nowrap w-[111px] max-md:ml-2.5">
-        <PokemonType v-for="type in pokemonDetail?.types" :key="type.type.name" :type="type.type.name" />
+      <div class="flex flex-col p-2">
+        <div class="flex items-center gap-4  max-md:ml-2.5">
+          <span class="text-white font-bold">Types:</span>
+          <div class="flex gap-2">
+            <PokemonType v-for="type in pokemonDetail?.types" :key="type.type.name" :type="type.type.name" />
+          </div>
+        </div>
+        <div class="flex items-center gap-4  mt-2 max-md:ml-2.5">
+          <span class="text-white font-bold">Weaknesses:</span>
+          <div class="flex gap-2">
+            <PokemonType v-for="weakness in weaknesses" :key="weakness" :type="weakness" />
+          </div>
+        </div>
       </div>
     </section>
     <nav class="flex flex-row pb-2.5 mx-auto mt-4 w-full max-w-full grow-0 max-md:pl-5" aria-label="Pokemon navigation">

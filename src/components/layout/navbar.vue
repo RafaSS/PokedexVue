@@ -28,6 +28,4 @@ export default {
 </template>
 
 
-<style scoped>
-/* Add component-specific styles here */
-</style>
+<style scoped></style>
