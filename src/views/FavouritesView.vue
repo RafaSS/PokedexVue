@@ -10,9 +10,6 @@ const currentPage = ref(1);
 const itemsPerPage = ref(10);
 const totalPokemons = ref(0);
 
-const capitalizeFirstLetter = (string: string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-};
 
 const loadData = () => {
     store.loadFavoritePokemon(currentPage.value, itemsPerPage.value);
@@ -48,11 +45,11 @@ const goToPokemonDetail = (name: string) => {
     <div class="max-w-2xl mx-auto p-5">
         <div class="bg-blue-600 p-5 rounded-lg shadow-lg">
             <h2 class="text-xl font-semibold mb-4 text-white">Select a Pokémon:</h2>
-            <div class="grid grid-cols-2 gap-4 m-24">
+            <div class="grid grid-cols-2 gap-4 ml-24 mr-24">
                 <div v-for="pokemon in pokemonList" :key="pokemon.name" @click="goToPokemonDetail(pokemon.name)"
                     class="cursor-pointer bg-red-600 text-white hover:underline inline-block items-center p-2 rounded-lg shadow-md text-center">
                     <img class="m-auto" :src="pokemon.sprite" alt="pokemon">
-                    <span>{{ capitalizeFirstLetter(pokemon.name) }}</span>
+                    <span class="capitalize">{{ (pokemon.name) }}</span>
                 </div>
             </div>
 

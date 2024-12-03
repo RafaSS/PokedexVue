@@ -70,9 +70,13 @@ const loadData = async () => {
 
   if (previousSpecies) {
     previousEvolutionDetail.value = await fetchPokemonDetails(previousSpecies);
+  }else{
+    previousEvolutionDetail.value = undefined;
   }
   if (nextSpecies) {
     nextEvolutionDetail.value = await fetchPokemonDetails(nextSpecies);
+  }else{
+    nextEvolutionDetail.value = undefined;
   }
 
   selectedImage.value = pokemonDetail.value?.sprites?.other['official-artwork'].front_default || undefined;
@@ -166,14 +170,14 @@ const updateSelectedImage = (image: string) => {
       aria-label="Pokemon Information">
       <div class="absolute top-4 right-4 cursor-pointer" @click="toggleFavorite">
         <img v-if="isFavorite" src="../assets/star.svg" alt="Remove from Favorites" class="w-8 h-8" />
-        <img v-else src="../assets/starDisabledg" alt="Add to Favorites" class="w-8 h-8" />
+        <img v-else src="../assets/starDisabled.svg" alt="Add to Favorites" class="w-8 h-8" />
       </div>
       <div class="flex flex-col max-md:max-w-full">
         <div class="flex gap-5 max-md:flex-col">
           <div class="flex flex-col w-[43%] max-md:ml-0 max-md:w-full">
             <div class="flex flex-col mt-1 w-full max-md:mt-4">
               <h1 id="pokemon-name"
-                class="self-center ml-4 w-auto tracking-tighter leading-tight text-5xl text-center text-white max-md:ml-2.5 max-md:text-4xl">
+                class="capitalize self-center ml-4 w-auto tracking-tighter leading-tight text-5xl text-center text-white max-md:ml-2.5 max-md:text-4xl">
                 {{ pokemonDetail?.name }}
               </h1>
               <div class="flex flex-wrap gap-12 items-start mt-5 min-h-[239px]">

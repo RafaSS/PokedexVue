@@ -3,7 +3,7 @@ import type { FavouritePokemon } from '../interfaces/Pokemon';
 
 export const usePokemonStore = defineStore('pokemonStore', {
   state: () => ({
-    favoritePokemon: [] as FavouritePokemon[], // List of favorite Pokémon
+    favoritePokemon: [] as FavouritePokemon[],
     totalFavoritePokemon: localStorage.getItem('favoritePokemon') ? JSON.parse(localStorage.getItem('favoritePokemon') || '[]').length : 0,
   }),
   getters: {},
