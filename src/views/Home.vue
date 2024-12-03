@@ -57,7 +57,7 @@ watch(inputValue, () => {
 
   debounceTimeout = setTimeout(async () => {
     if (inputValue.value) {
-      const response = await fetchPokemonList(10, 0);
+      const response = await fetchPokemonList(100000, 0);
       pokemonListSearch.value = response.results.filter(pokemon => 
         pokemon.name.includes(inputValue.value.toLowerCase())
       );
@@ -87,7 +87,7 @@ watch(inputValue, () => {
         </div>
       </div>
     </div>
-    
+
 
     <!-- Pokemon Grid Section -->
     <div class="max-w-4xl w-full">
