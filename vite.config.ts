@@ -1,10 +1,10 @@
-import { defineConfig } from 'vitest/config';
-import vue from '@vitejs/plugin-vue';
+import { defineConfig } from 'vitest/config'
+import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
   optimizeDeps: {
-    include: ['axios', 'vue-router','pinia'],
+    include: ['axios', 'vue-router', 'pinia'],
   },
   server: {
     proxy: {
@@ -17,6 +17,6 @@ export default defineConfig({
   },
   test: {
     environment: 'happy-dom',
-    globals:true,
+    globals: true,
   },
-});
+})
