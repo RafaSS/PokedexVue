@@ -208,9 +208,9 @@ const updateSelectedImage = (image: string) => {
         </div>
       </div>
     </section>
-    <nav class="flex flex-row pb-2.5 mx-auto mt-4 w-full max-w-full grow-0 max-md:pl-5" aria-label="Pokemon navigation">
+    <div class="flex flex-row pb-2.5 mx-auto mt-4 w-full max-w-full grow-0 max-md:pl-5" aria-label="Pokemon navigation">
       <PokemonNavigation :previous="previousEvolutionDetail || ''" :next="nextEvolutionDetail || ''"
         :other="otherArtWork" @selectImage="updateSelectedImage" />
-    </nav>
+    </div>
   </article>
 </template>
