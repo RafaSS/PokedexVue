@@ -8,7 +8,8 @@
     "preview": "vite preview",
     "test": "vitest --dom",
     "lint:fix": "eslint \"**/*.{js,ts,vue}\" --fix",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "start": "vite preview --host"
   },
   "dependencies": {
     "autoprefixer": "^10",

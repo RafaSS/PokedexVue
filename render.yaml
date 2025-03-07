@@ -2,11 +2,13 @@ services:
   - type: web
     name: pokedex-vue
     runtime: node
-    buildCommand: npm install && npm run build
-    startCommand: npm run preview
+    buildCommand: bun install && bun run build
+    startCommand: bun run start
     env:
       - key: NODE_ENV
         value: production
+      - key: RUNTIME_ENV
+        value: bun
     routes:
       - source: /
         destination: /dist/index.html
