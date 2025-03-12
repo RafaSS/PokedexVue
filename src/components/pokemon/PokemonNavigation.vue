@@ -44,74 +44,83 @@
 </script>
 
 <template>
-  <div class="flex flex-col items-center w-full">
-    <div class="flex justify-between items-center w-full">
+  <div class="pokemon-navigation">
+    <div class="navigation-container">
       <button
         v-if="previous"
         @click="router.push(`/pokemondetail/${previous.name}`)"
-        class="flex flex-col items-center"
+        class="nav-button prev-button"
         :aria-label="previous ? `Go to ${previous.name}` : 'Go to previous'"
       >
-        <img
-          v-if="previous"
-          :src="previous.sprites?.other['official-artwork'].front_default"
-          class="object-contain aspect-[1.11] w-[90px] transition-transform transform hover:scale-110"
-        />
-        <div
-          class="overflow-hidden flex-1 shrink gap-2 px-4 py-2 mt-5 bg-sky-700 h-auto min-h-[60px] rounded-full w-auto min-w-[60px] text-white text-3xl font-bold"
-        >
-          &lt;
+        <div class="pokemon-preview">
+          <img
+            v-if="previous"
+            :src="previous.sprites?.other['official-artwork'].front_default"
+            class="pokemon-image"
+            :alt="previous.name"
+          />
+          <span class="pokemon-name">{{ previous.name }}</span>
+        </div>
+        <div class="nav-arrow prev-arrow">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="arrow-icon">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
         </div>
       </button>
 
       <button
         v-else
-        class="flex flex-col items-center"
-        aria-label="Previous evolution"
+        class="nav-button prev-button disabled"
+        aria-label="No previous evolution"
+        disabled
       >
-        <img
-          src="https://cdn.builder.io/api/v1/image/assets/6d68e11debc844a1ade269bfeb7cc3c0/1aa5f61aa7172c587cc8d8c12cddf81a213ce9ea26d9990faeb6151aca9c6fe6?apiKey=6d68e11debc844a1ade269bfeb7cc3c0&"
-          class="object-contain aspect-[1.11] w-[90px]"
-        />
-        <div
-          class="overflow-hidden flex-1 shrink gap-2 px-4 py-2 mt-5 bg-sky-700 h-[60px] min-h-[60px] rounded-full w-[60px] text-white text-3xl font-bold"
-        >
-          &lt;
+        <div class="pokemon-preview empty">
+          <div class="empty-pokemon"></div>
+          <span class="pokemon-name">No Previous</span>
+        </div>
+        <div class="nav-arrow prev-arrow disabled">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="arrow-icon">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
         </div>
       </button>
-      <div class="col w-full md:w-auto">
-        <div class="text-lg font-bold text-center md:text-left">
-          Alternative Images
-        </div>
-        <div
-          class="flex gap-1 items-center justify-center md:justify-start"
-          role="navigation"
-          aria-label="Alternative Carousel"
-        >
+
+      <div class="alternatives-container">
+        <h3 class="alternatives-title">Alternative Images</h3>
+        <div class="alternatives-carousel" role="navigation" aria-label="Alternative Carousel">
           <button
             @click="prevImage"
-            class="overflow-hidden px-1 py-1.5 rounded-lg bg-red-500"
+            class="carousel-button"
             aria-label="Previous Alternative"
           >
-            &lt;
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="carousel-arrow">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
           </button>
-          <div class="flex gap-1">
-            <img
+          
+          <div class="alternatives-images">
+            <div 
               v-for="(image, index) in visibleImages"
               :key="index"
-              :src="image"
-              alt="Alternative Image"
-              class="object-contain cursor-pointer w-10 rounded-full aspect-square transition-transform transform hover:scale-110"
+              class="alternative-image-container"
               @click="selectImage(image)"
-              style="background-color: transparent"
-            />
+            >
+              <img
+                :src="image"
+                alt="Alternative Image"
+                class="alternative-image"
+              />
+            </div>
           </div>
+          
           <button
             @click="nextImage"
-            class="overflow-hidden px-1 py-1.5 rounded-lg bg-red-500"
+            class="carousel-button"
             aria-label="Next Alternative"
           >
-            &gt;
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="carousel-arrow">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
           </button>
         </div>
       </div>
@@ -119,35 +128,239 @@
       <button
         v-if="next"
         @click="router.push(`/pokemondetail/${next.name}`)"
-        class="flex flex-col items-center"
+        class="nav-button next-button"
         :aria-label="`Go to ${(next as PokemonDetails).name}`"
       >
-        <img
-          :src="next.sprites?.other['official-artwork'].front_default"
-          class="object-contain aspect-[0.98] w-[114px] transition-transform transform hover:scale-110"
-        />
-        <div
-          class="overflow-hidden flex-1 gap-2 px-4 py-2 bg-sky-700 h-[60px] min-h-[60px] rounded-full w-[60px] text-white text-3xl font-bold transition-transform transform hover:scale-110"
-        >
-          <p>&gt;</p>
+        <div class="nav-arrow next-arrow">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="arrow-icon">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </div>
+        <div class="pokemon-preview">
+          <img
+            :src="next.sprites?.other['official-artwork'].front_default"
+            class="pokemon-image"
+            :alt="next.name"
+          />
+          <span class="pokemon-name">{{ next.name }}</span>
         </div>
       </button>
 
       <button
         v-else
-        class="flex flex-col items-center"
-        aria-label="Next evolution"
+        class="nav-button next-button disabled"
+        aria-label="No next evolution"
+        disabled
       >
-        <img
-          src="https://cdn.builder.io/api/v1/image/assets/6d68e11debc844a1ade269bfeb7cc3c0/1aa5f61aa7172c587cc8d8c12cddf81a213ce9ea26d9990faeb6151aca9c6fe6?apiKey=6d68e11debc844a1ade269bfeb7cc3c0&"
-          class="object-contain aspect-[1.11] w-[90px] transition-transform transform hover:scale-110"
-        />
-        <div
-          class="overflow-hidden flex-1 shrink gap-2 px-4 py-2 bg-sky-700 h-[60px] min-h-[60px] rounded-full w-[60px] text-white text-3xl font-bold"
-        >
-          &gt;
+        <div class="nav-arrow next-arrow disabled">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="arrow-icon">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </div>
+        <div class="pokemon-preview empty">
+          <div class="empty-pokemon"></div>
+          <span class="pokemon-name">No Next</span>
         </div>
       </button>
     </div>
   </div>
 </template>
+
+<style scoped>
+.pokemon-navigation {
+  width: 100%;
+  padding: 1rem 0;
+}
+
+.navigation-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.nav-button:hover {
+  transform: translateY(-3px);
+}
+
+.nav-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pokemon-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100px;
+}
+
+.pokemon-image {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+}
+
+.nav-button:hover .pokemon-image {
+  transform: scale(1.1);
+}
+
+.pokemon-name {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: white;
+  text-transform: capitalize;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.empty-pokemon {
+  width: 90px;
+  height: 90px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background-color: #0284c7; /* bg-sky-600 */
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.prev-button .nav-arrow {
+  margin-right: 0.5rem;
+}
+
+.next-button .nav-arrow {
+  margin-left: 0.5rem;
+}
+
+.nav-button:hover .nav-arrow {
+  transform: scale(1.1);
+  background-color: #0369a1; /* bg-sky-700 */
+}
+
+.arrow-icon {
+  width: 20px;
+  height: 20px;
+  color: white;
+}
+
+.alternatives-container {
+  flex: 1;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 1rem;
+}
+
+.alternatives-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 0.75rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.alternatives-carousel {
+  display: flex;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  background-color: #ef4444; /* bg-red-500 */
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.carousel-button:hover {
+  background-color: #dc2626; /* bg-red-600 */
+  transform: scale(1.05);
+}
+
+.carousel-arrow {
+  width: 16px;
+  height: 16px;
+  color: white;
+}
+
+.alternatives-images {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 0.5rem;
+}
+
+.alternative-image-container {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.alternative-image-container:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.alternative-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .navigation-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .alternatives-container {
+    order: 3;
+    max-width: 100%;
+    margin: 1rem 0;
+  }
+  
+  .alternatives-title {
+    text-align: center;
+  }
+}
+</style>
