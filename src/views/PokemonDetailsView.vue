@@ -201,13 +201,13 @@
       >
         <img
           v-if="isFavorite"
-          src="../assets/star.svg"
+          src="../assets/newStar.svg"
           alt="Remove from Favorites"
           class="w-8 h-8"
         />
         <img
           v-else
-          src="../assets/starDisabled.svg"
+          src="../assets/newStarDisabled.svg"
           alt="Add to Favorites"
           class="w-8 h-8"
         />

@@ -3,8 +3,10 @@
   import { ref, onMounted, onUnmounted, watch } from 'vue'
   import { fetchPokemonList } from '../api/pokemonApi'
   import type { Result } from '../interfaces/Pokemon'
+  import { usePokemonStore } from '../store/pokemon'
 
   const router = useRouter()
+  const pokemonStore = usePokemonStore()
   const inputValue = ref('')
   const pokemonList = ref<Result[]>([])
   const isLoading = ref(false)
@@ -66,6 +68,23 @@
     inputValue.value = ''
     offset.value = 0
     fetchPokemons()
+  }
+
+  const toggleFavorite = (pokemon: Result) => {
+    const id = getPokemonIdFromUrl(pokemon.url)
+    if (pokemonStore.isFavoritePokemon(pokemon.name)) {
+      pokemonStore.removeFavoritePokemon(pokemon.name)
+    } else {
+      pokemonStore.saveFavoritePokemon({
+        id,
+        name: pokemon.name,
+        url: `pokemon/${pokemon.name}`,
+      })
+    }
+  }
+
+  const isPokemonFavorite = (name: string) => {
+    return pokemonStore.isFavoritePokemon(name)
   }
 
   watch(inputValue, () => {
@@ -152,10 +171,27 @@
             v-for="pokemon in pokemonList"
             :key="pokemon.name"
             class="bg-red-500 rounded-xl overflow-hidden shadow-md cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg relative"
-            @click="goToPokemonDetail(pokemon.name)"
           >
             <div
+              class="absolute top-2 right-2 z-10"
+              @click.stop="toggleFavorite(pokemon)"
+            >
+              <img
+                v-if="isPokemonFavorite(pokemon.name)"
+                src="../assets/newStar.svg"
+                alt="Remove from Favorites"
+                class="w-6 h-6"
+              />
+              <img
+                v-else
+                src="../assets/newStarDisabled.svg"
+                alt="Add to Favorites"
+                class="w-6 h-6"
+              />
+            </div>
+            <div
               class="bg-gradient-radial from-white/30 to-black/10 p-4 flex justify-center items-center h-30"
+              @click="goToPokemonDetail(pokemon.name)"
             >
               <img
                 :src="getPokemonImageUrl(getPokemonIdFromUrl(pokemon.url))"
@@ -164,7 +200,10 @@
                 loading="lazy"
               />
             </div>
-            <div class="bg-white p-3 relative">
+            <div
+              class="bg-white p-3 relative"
+              @click="goToPokemonDetail(pokemon.name)"
+            >
               <span
                 class="absolute -top-5 right-2.5 bg-black/60 text-white text-xs px-2 py-1 rounded-full font-bold"
               >
