@@ -89,13 +89,13 @@
         v-if="isFavorite"
         src="../../assets/newStar.svg"
         alt="Remove from Favorites"
-        class="w-6 h-6"
+        class="w-6 h-6 transition-transform duration-200 hover:scale-125"
       />
       <img
         v-else
         src="../../assets/newStarDisabled.svg"
         alt="Add to Favorites"
-        class="w-6 h-6"
+        class="w-6 h-6 transition-transform duration-200 hover:scale-125"
       />
     </div>
     <div
