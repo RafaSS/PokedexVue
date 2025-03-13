@@ -46,7 +46,7 @@
     <div
       class="bg-gradient-to-br from-blue-700 to-blue-900 p-8 rounded-2xl shadow-xl"
     >
-      <h1 class="text-3xl font-bold mb-8 text-white text-center">Favourites</h1>
+      <h1 class="text-3xl font-bold mb-8 text-white text-center">Favorites</h1>
 
       <div v-if="isLoading" class="flex justify-center my-12">
         <div
@@ -73,7 +73,7 @@
           />
         </svg>
         <p class="text-xl">
-          No favourites yet. Add some Pokémon to your favourites!
+          No favorites yet. Add some Pokémon to your favorites!
         </p>
       </div>
 

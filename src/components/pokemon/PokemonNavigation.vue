@@ -49,7 +49,7 @@
       <button
         v-if="previous"
         @click="router.push(`/pokemondetail/${previous.name}`)"
-        class="nav-button prev-button"
+        class="nav-button prev-button fade-in"
         :aria-label="previous ? `Go to ${previous.name}` : 'Go to previous'"
       >
         <div class="pokemon-preview">
@@ -79,7 +79,7 @@
 
       <button
         v-else
-        class="nav-button prev-button disabled"
+        class="nav-button prev-button disabled fade-in"
         aria-label="No previous evolution"
         disabled
       >
@@ -103,7 +103,7 @@
         </div>
       </button>
 
-      <div class="alternatives-container">
+      <div class="alternatives-container fade-in">
         <h3 class="alternatives-title">Alternative Images</h3>
         <div
           class="alternatives-carousel"
@@ -168,7 +168,7 @@
       <button
         v-if="next"
         @click="router.push(`/pokemondetail/${next.name}`)"
-        class="nav-button next-button"
+        class="nav-button next-button fade-in"
         :aria-label="`Go to ${(next as PokemonDetails).name}`"
       >
         <div class="nav-arrow next-arrow">
@@ -197,7 +197,7 @@
 
       <button
         v-else
-        class="nav-button next-button disabled"
+        class="nav-button next-button disabled fade-in"
         aria-label="No next evolution"
         disabled
       >
@@ -227,7 +227,8 @@
 <style scoped>
   .pokemon-navigation {
     width: 100%;
-    padding: 1rem 0;
+    padding: 1.5rem 0;
+    margin-top: 1rem;
   }
 
   .navigation-container {
@@ -235,26 +236,41 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .nav-button {
     display: flex;
     align-items: center;
-    background: transparent;
-    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
   .nav-button:hover {
     transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+
+  .nav-button:active {
+    transform: translateY(-1px);
   }
 
   .nav-button.disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 
   .pokemon-preview {
@@ -268,51 +284,84 @@
     width: 90px;
     height: 90px;
     object-fit: contain;
-    transition: transform 0.3s ease;
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
   }
 
   .nav-button:hover .pokemon-image {
-    transform: scale(1.1);
+    transform: scale(1.1) rotate(-5deg);
+  }
+
+  .next-button:hover .pokemon-image {
+    transform: scale(1.1) rotate(5deg);
   }
 
   .pokemon-name {
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
     color: white;
     text-transform: capitalize;
     font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.02em;
   }
 
   .empty-pokemon {
     width: 90px;
     height: 90px;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.08);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .empty-pokemon::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      45deg,
+      transparent 45%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 55%
+    );
+    top: 0;
+    left: 0;
+    animation: shine 3s infinite;
+  }
+
+  @keyframes shine {
+    0% {
+      transform: translateX(-100%) rotate(45deg);
+    }
+    20%,
+    100% {
+      transform: translateX(100%) rotate(45deg);
+    }
   }
 
   .nav-arrow {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     background-color: #0284c7; /* bg-sky-600 */
     border-radius: 50%;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .prev-button .nav-arrow {
-    margin-right: 0.5rem;
+    margin-right: 0.75rem;
   }
 
   .next-button .nav-arrow {
-    margin-left: 0.5rem;
+    margin-left: 0.75rem;
   }
 
   .nav-button:hover .nav-arrow {
@@ -321,8 +370,8 @@
   }
 
   .arrow-icon {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     color: white;
   }
 
@@ -332,83 +381,117 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 0 1rem;
+    margin: 0 1.25rem;
   }
 
   .alternatives-title {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: bold;
     color: white;
     margin-bottom: 0.75rem;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
   }
 
   .alternatives-carousel {
     display: flex;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 0.75rem;
-    padding: 0.5rem;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 1rem;
+    padding: 0.75rem;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    width: 100%;
   }
 
   .carousel-button {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     background-color: #ef4444; /* bg-red-500 */
     border: none;
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   }
 
   .carousel-button:hover {
     background-color: #dc2626; /* bg-red-600 */
-    transform: scale(1.05);
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .carousel-button:active {
+    transform: scale(0.95);
   }
 
   .carousel-arrow {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     color: white;
   }
 
   .alternatives-images {
     display: flex;
-    gap: 0.5rem;
-    margin: 0 0.5rem;
+    gap: 0.75rem;
+    margin: 0 0.75rem;
   }
 
   .alternative-image-container {
-    width: 48px;
-    height: 48px;
-    border-radius: 0.5rem;
+    width: 60px;
+    height: 60px;
+    border-radius: 0.75rem;
     overflow: hidden;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     background-color: rgba(255, 255, 255, 0.1);
     position: relative;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   }
 
   .alternative-image-container:hover {
-    transform: scale(1.1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
+    z-index: 1;
   }
 
   .alternative-image {
     width: 100%;
     height: 100%;
     object-fit: contain;
+    transition: transform 0.3s ease;
+  }
+
+  .alternative-image-container:hover .alternative-image {
+    transform: scale(1.1);
+  }
+
+  /* Animation classes */
+  .fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   /* Responsive Styles */
   @media (max-width: 768px) {
     .navigation-container {
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 2rem;
+      padding: 1.25rem;
     }
 
     .alternatives-container {
@@ -419,6 +502,22 @@
 
     .alternatives-title {
       text-align: center;
+    }
+
+    .nav-button {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .alternatives-images {
+      gap: 0.5rem;
+    }
+
+    .alternative-image-container {
+      width: 50px;
+      height: 50px;
     }
   }
 </style>

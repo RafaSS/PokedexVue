@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, onMounted, watch } from 'vue'
+  import { ref, onMounted, watch, computed } from 'vue'
   import { useRoute } from 'vue-router'
   import {
     fetchPokemonDetails,
@@ -29,66 +29,137 @@
   const nextEvolutionDetail = ref<PokemonDetails>()
   const selectedImage = ref<string | undefined>(undefined)
   const weaknesses = ref<string[]>([])
+  const isLoading = ref(true)
+
+  const mainTypeColor = computed(() => {
+    if (!pokemonDetail.value?.types || pokemonDetail.value.types.length === 0) {
+      return 'bg-blue-700'
+    }
+
+    const type = pokemonDetail.value.types[0].type.name
+    const typeColors: Record<string, string> = {
+      normal: 'bg-gray-400',
+      fire: 'bg-red-600',
+      water: 'bg-blue-500',
+      electric: 'bg-yellow-400',
+      grass: 'bg-green-500',
+      ice: 'bg-blue-200',
+      fighting: 'bg-red-800',
+      poison: 'bg-purple-500',
+      ground: 'bg-yellow-600',
+      flying: 'bg-indigo-300',
+      psychic: 'bg-pink-500',
+      bug: 'bg-green-600',
+      rock: 'bg-yellow-700',
+      ghost: 'bg-purple-700',
+      dragon: 'bg-indigo-600',
+      dark: 'bg-gray-800',
+      steel: 'bg-gray-500',
+      fairy: 'bg-pink-300',
+    }
+
+    return typeColors[type] || 'bg-blue-700'
+  })
+
+  const cardAccentColor = computed(() => {
+    if (!pokemonDetail.value?.types || pokemonDetail.value.types.length < 2) {
+      return 'bg-blue-900'
+    }
+
+    const type = pokemonDetail.value.types[1].type.name
+    const typeColors: Record<string, string> = {
+      normal: 'bg-gray-600',
+      fire: 'bg-red-800',
+      water: 'bg-blue-700',
+      electric: 'bg-yellow-600',
+      grass: 'bg-green-700',
+      ice: 'bg-blue-400',
+      fighting: 'bg-red-900',
+      poison: 'bg-purple-700',
+      ground: 'bg-yellow-800',
+      flying: 'bg-indigo-500',
+      psychic: 'bg-pink-700',
+      bug: 'bg-green-800',
+      rock: 'bg-yellow-900',
+      ghost: 'bg-purple-900',
+      dragon: 'bg-indigo-800',
+      dark: 'bg-gray-900',
+      steel: 'bg-gray-700',
+      fairy: 'bg-pink-500',
+    }
+
+    return typeColors[type] || 'bg-blue-900'
+  })
 
   const loadData = async () => {
-    pokemonDetail.value = await fetchPokemonDetails(route.params.name as string)
-    pokemonSpecies.value = await fetchPokemonSpecies(
-      route.params.name as string
-    )
-    otherArtWork.value = await getAltArtWork(
-      pokemonDetail.value as PokemonDetails
-    )
-    pokemonEvolution.value = await fetchPokemonEvolutionChain(
-      extractEvolutionIdFromUrl(
-        pokemonSpecies.value?.evolution_chain.url as string
+    isLoading.value = true
+    try {
+      pokemonDetail.value = await fetchPokemonDetails(
+        route.params.name as string
       )
-    )
-    isFavorite.value = usePokemonStore().isFavoritePokemon(
-      pokemonDetail.value.name as string
-    )
-
-    const previousSpecies = findPreviousEvolution(
-      pokemonEvolution.value?.chain,
-      route.params.name as string
-    )
-
-    const halfDamage = new Set<string>()
-    const doubleDamage = new Set<string>()
-
-    for (const type of pokemonDetail.value?.types || []) {
-      const typeDetails = await fetchTypeDetails(type.type.name)
-      for (const damageRelation of typeDetails.damage_relations
-        .double_damage_from) {
-        doubleDamage.add(damageRelation.name)
-      }
-      for (const damageRelation of typeDetails.damage_relations
-        .half_damage_from) {
-        halfDamage.add(damageRelation.name)
-      }
-      weaknesses.value = Array.from(doubleDamage).filter(
-        (type) => !halfDamage.has(type)
+      pokemonSpecies.value = await fetchPokemonSpecies(
+        route.params.name as string
       )
-    }
+      otherArtWork.value = await getAltArtWork(
+        pokemonDetail.value as PokemonDetails
+      )
+      pokemonEvolution.value = await fetchPokemonEvolutionChain(
+        extractEvolutionIdFromUrl(
+          pokemonSpecies.value?.evolution_chain.url as string
+        )
+      )
+      isFavorite.value = usePokemonStore().isFavoritePokemon(
+        pokemonDetail.value.name as string
+      )
 
-    const nextSpecies = findNextEvolution(
-      pokemonEvolution.value?.chain,
-      route.params.name as string
-    )
+      const previousSpecies = findPreviousEvolution(
+        pokemonEvolution.value?.chain,
+        route.params.name as string
+      )
 
-    if (previousSpecies) {
-      previousEvolutionDetail.value = await fetchPokemonDetails(previousSpecies)
-    } else {
-      previousEvolutionDetail.value = undefined
-    }
-    if (nextSpecies) {
-      nextEvolutionDetail.value = await fetchPokemonDetails(nextSpecies)
-    } else {
-      nextEvolutionDetail.value = undefined
-    }
+      const halfDamage = new Set<string>()
+      const doubleDamage = new Set<string>()
 
-    selectedImage.value =
-      pokemonDetail.value?.sprites?.other['official-artwork'].front_default ||
-      undefined
+      for (const type of pokemonDetail.value?.types || []) {
+        const typeDetails = await fetchTypeDetails(type.type.name)
+        for (const damageRelation of typeDetails.damage_relations
+          .double_damage_from) {
+          doubleDamage.add(damageRelation.name)
+        }
+        for (const damageRelation of typeDetails.damage_relations
+          .half_damage_from) {
+          halfDamage.add(damageRelation.name)
+        }
+        weaknesses.value = Array.from(doubleDamage).filter(
+          (type) => !halfDamage.has(type)
+        )
+      }
+
+      const nextSpecies = findNextEvolution(
+        pokemonEvolution.value?.chain,
+        route.params.name as string
+      )
+
+      if (previousSpecies) {
+        previousEvolutionDetail.value =
+          await fetchPokemonDetails(previousSpecies)
+      } else {
+        previousEvolutionDetail.value = undefined
+      }
+      if (nextSpecies) {
+        nextEvolutionDetail.value = await fetchPokemonDetails(nextSpecies)
+      } else {
+        nextEvolutionDetail.value = undefined
+      }
+
+      selectedImage.value =
+        pokemonDetail.value?.sprites?.other['official-artwork'].front_default ||
+        undefined
+    } catch (error) {
+      console.error('Error loading Pokemon details:', error)
+    } finally {
+      isLoading.value = false
+    }
   }
 
   onMounted(loadData)
@@ -186,96 +257,194 @@
 </script>
 
 <template>
-  <article
-    class="flex overflow-hidden flex-col self-center px-20 py-8 bg-red-500 rounded-3xl max-md:px-5 md:ml-20 md:mr-20 mt-10"
-    role="article"
-    aria-labelledby="pokemon-name"
-  >
-    <section
-      class="relative flex flex-col pt-3 pr-4 pb-0.5 pl-16 w-full bg-sky-600 rounded-3xl max-md:pl-5 max-md:max-w-full"
-      aria-label="Pokemon Information"
-    >
+  <div class="container mx-auto px-4 py-8 animate-fade-in">
+    <!-- Loading Skeleton -->
+    <div v-if="isLoading" class="max-w-4xl mx-auto">
+      <div class="animate-pulse bg-gray-200 h-96 rounded-xl mb-4"></div>
       <div
-        class="absolute top-4 right-4 cursor-pointer"
-        @click="toggleFavorite"
-      >
-        <img
-          v-if="isFavorite"
-          src="../assets/newStar.svg"
-          alt="Remove from Favorites"
-          class="w-8 h-8"
-        />
-        <img
-          v-else
-          src="../assets/newStarDisabled.svg"
-          alt="Add to Favorites"
-          class="w-8 h-8"
-        />
+        class="animate-pulse bg-gray-200 h-12 rounded-lg mb-4 w-1/3 mx-auto"
+      ></div>
+      <div
+        class="animate-pulse bg-gray-200 h-8 rounded-lg mb-4 w-1/2 mx-auto"
+      ></div>
+      <div class="flex space-x-4 mb-4">
+        <div class="animate-pulse bg-gray-200 h-6 rounded-lg w-1/4"></div>
+        <div class="animate-pulse bg-gray-200 h-6 rounded-lg w-1/4"></div>
+        <div class="animate-pulse bg-gray-200 h-6 rounded-lg w-1/4"></div>
       </div>
-      <div class="flex flex-col max-md:max-w-full">
-        <div class="flex gap-5 max-md:flex-col">
-          <div class="flex flex-col w-[43%] max-md:ml-0 max-md:w-full">
-            <div class="flex flex-col mt-1 w-full max-md:mt-4">
-              <h1
-                id="pokemon-name"
-                class="capitalize self-center ml-4 w-auto tracking-tighter leading-tight text-5xl text-center text-white max-md:ml-2.5 max-md:text-4xl"
-              >
-                {{ pokemonDetail?.name }}
-              </h1>
-              <div class="flex flex-wrap gap-12 items-start mt-5 min-h-[239px]">
-                <PokemonStat
-                  v-for="(stat, index) in pokemonDetail?.stats"
-                  :key="index"
-                  :label="stat.stat.name"
-                  :value="stat.base_stat"
+    </div>
+
+    <!-- Pokemon Details Card -->
+    <article
+      v-else
+      :class="[
+        'flex flex-col rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 transform hover:shadow-[0_10px_40px_rgba(0,0,0,0.3)] max-w-4xl mx-auto',
+        mainTypeColor,
+      ]"
+      role="article"
+      aria-labelledby="pokemon-name"
+    >
+      <!-- Header with ID and Pokeball background -->
+      <div
+        class="relative py-4 px-6 flex justify-between items-center overflow-hidden"
+      >
+        <span class="text-white/70 font-bold text-xl">
+          #{{ pokemonDetail?.id }}
+        </span>
+        <div
+          class="absolute right-0 top-0 w-32 h-32 rounded-full bg-white/10 -mr-10 -mt-10 z-0"
+        ></div>
+      </div>
+
+      <!-- Main content section -->
+      <section
+        :class="[
+          'relative p-6 w-full rounded-3xl transition-all duration-500',
+          cardAccentColor,
+        ]"
+        aria-label="Pokemon Information"
+      >
+        <!-- Favorite button -->
+        <button
+          class="absolute top-4 right-4 cursor-pointer z-10 transform transition-transform duration-300 hover:scale-110"
+          @click="toggleFavorite"
+          :aria-label="
+            isFavorite ? 'Remove from Favorites' : 'Add to Favorites'
+          "
+        >
+          <svg
+            class="w-8 h-8"
+            :class="
+              isFavorite
+                ? 'text-yellow-400 animate-favorite-pop'
+                : 'text-white/50'
+            "
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+            />
+          </svg>
+        </button>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Pokemon Image Section -->
+          <div
+            class="flex flex-col items-center justify-center order-1 md:order-2"
+          >
+            <div
+              class="relative w-full aspect-square bg-white/10 rounded-xl p-4 flex items-center justify-center overflow-hidden"
+            >
+              <div class="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+              <div
+                class="absolute w-40 h-40 rounded-full bg-white/10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+              ></div>
+              <img
+                :src="selectedImage"
+                :alt="`${pokemonDetail?.name} artwork`"
+                class="object-contain w-3/4 h-3/4 z-10 transition-all duration-500 transform hover:scale-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                loading="lazy"
+              />
+            </div>
+          </div>
+
+          <!-- Pokemon Info Section -->
+          <div class="flex flex-col order-2 md:order-1">
+            <h1
+              id="pokemon-name"
+              class="capitalize text-4xl md:text-5xl font-bold text-white mb-4 text-center md:text-left transition-all duration-300"
+            >
+              {{ pokemonDetail?.name }}
+            </h1>
+
+            <!-- Types -->
+            <div class="flex items-center gap-4 mb-4">
+              <span class="text-white/90 font-semibold">Types:</span>
+              <div class="flex gap-2">
+                <PokemonType
+                  v-for="type in pokemonDetail?.types"
+                  :key="type.type.name"
+                  :type="type.type.name"
+                  class="transition-transform duration-300 hover:scale-105"
                 />
               </div>
             </div>
-          </div>
-          <div class="flex flex-col ml-5 w-[57%] max-md:ml-0 max-md:w-full">
-            <img
-              :src="selectedImage"
-              :alt="`${pokemonDetail?.name} official artwork`"
-              class="object-contain grow mx-auto w-full aspect-[1.25] max-w-[442px] max-md:mt-3 max-md:max-w-full"
-              loading="lazy"
-              style="image-rendering: pixelated"
-            />
+
+            <!-- Weaknesses -->
+            <div class="flex items-center gap-4 mb-6">
+              <span class="text-white/90 font-semibold">Weaknesses:</span>
+              <div class="flex flex-wrap gap-2">
+                <PokemonType
+                  v-for="weakness in weaknesses"
+                  :key="weakness"
+                  :type="weakness"
+                  class="transition-transform duration-300 hover:scale-105"
+                />
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 gap-x-6 gap-y-3">
+              <PokemonStat
+                v-for="(stat, index) in pokemonDetail?.stats"
+                :key="index"
+                :label="stat.stat.name"
+                :value="stat.base_stat"
+                class="transition-all duration-300 hover:translate-x-1"
+              />
+            </div>
           </div>
         </div>
+      </section>
+
+      <!-- Evolution and image navigation -->
+      <div
+        class="p-4 w-full transition-all duration-300"
+        aria-label="Pokemon navigation"
+      >
+        <PokemonNavigation
+          :previous="previousEvolutionDetail || ''"
+          :next="nextEvolutionDetail || ''"
+          :other="otherArtWork"
+          @selectImage="updateSelectedImage"
+          class="transition-all duration-300"
+        />
       </div>
-      <div class="flex flex-col p-2">
-        <div class="flex items-center gap-4 max-md:ml-2.5">
-          <span class="text-white font-bold">Types:</span>
-          <div class="flex gap-2">
-            <PokemonType
-              v-for="type in pokemonDetail?.types"
-              :key="type.type.name"
-              :type="type.type.name"
-            />
-          </div>
-        </div>
-        <div class="flex items-center gap-4 mt-2 max-md:ml-2.5">
-          <span class="text-white font-bold">Weaknesses:</span>
-          <div class="flex gap-2">
-            <PokemonType
-              v-for="weakness in weaknesses"
-              :key="weakness"
-              :type="weakness"
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-    <div
-      class="flex flex-row pb-2.5 mx-auto mt-4 w-full max-w-full grow-0 max-md:pl-5"
-      aria-label="Pokemon navigation"
-    >
-      <PokemonNavigation
-        :previous="previousEvolutionDetail || ''"
-        :next="nextEvolutionDetail || ''"
-        :other="otherArtWork"
-        @selectImage="updateSelectedImage"
-      />
-    </div>
-  </article>
+    </article>
+  </div>
 </template>
+
+<style scoped>
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+  }
+
+  .animate-favorite-pop {
+    animation: favoritePop 0.4s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes favoritePop {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.4);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+</style>
