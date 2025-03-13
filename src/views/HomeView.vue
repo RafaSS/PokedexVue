@@ -1,17 +1,19 @@
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted, watch } from 'vue'
-  import { fetchPokemonList } from '../api/pokemonApi'
+  import { fetchPokemonList, fetchTypeDetails } from '../api/pokemonApi'
   import type { Result } from '../interfaces/Pokemon'
   import PokemonCard from '../components/pokemon/PokemonCard.vue'
   import PokemonType from '../components/pokemon/PokemonType.vue'
 
   const inputValue = ref('')
   const pokemonList = ref<Result[]>([])
+  const allPokemonData = ref<Result[]>([])
   const isLoading = ref(false)
   const offset = ref(0)
   const limit = 30
   let debounceTimeout: ReturnType<typeof setTimeout> | undefined
   const selectedTypes = ref<string[]>([])
+  const isLoadingMore = ref(false)
   const allPokemonTypes = [
     'normal',
     'fire',
@@ -34,20 +36,32 @@
   ]
 
   const fetchPokemons = async () => {
-    if (isLoading.value) return
+    if (isLoading.value || isLoadingMore.value) return
 
-    isLoading.value = true
+    isLoadingMore.value = true
     const response = await fetchPokemonList(limit, offset.value)
-    pokemonList.value = [...pokemonList.value, ...response.results]
+    allPokemonData.value = [...allPokemonData.value, ...response.results]
+
+    // Apply any active filters
+    if (selectedTypes.value.length > 0) {
+      await applyTypeFilters()
+    } else {
+      pokemonList.value = [...allPokemonData.value]
+    }
+
     offset.value += limit
-    isLoading.value = false
+    isLoadingMore.value = false
   }
 
   const handleScroll = () => {
     const scrollPosition = window.innerHeight + window.scrollY
     const scrollThreshold = document.documentElement.scrollHeight * 0.8 // Load when user scrolls to 80% of the page
 
-    if (scrollPosition >= scrollThreshold) {
+    // Only fetch more if we're not at the bottom of the page
+    if (
+      scrollPosition >= scrollThreshold &&
+      scrollPosition < document.documentElement.scrollHeight - 10
+    ) {
       fetchPokemons()
     }
   }
@@ -65,9 +79,16 @@
     isLoading.value = true
     offset.value = 0
     const response = await fetchPokemonList(10000, 0)
-    pokemonList.value = response.results
-      .filter((pokemon: Result) => pokemon.name.includes(inputValue.value))
-      .slice(0, limit)
+    allPokemonData.value = response.results
+
+    if (selectedTypes.value.length > 0) {
+      await applyTypeFilters()
+    } else {
+      pokemonList.value = allPokemonData.value
+        .filter((pokemon: Result) => pokemon.name.includes(inputValue.value))
+        .slice(0, limit)
+    }
+
     isLoading.value = false
   }
 
@@ -89,13 +110,69 @@
     }, 300)
   })
 
-  const toggleTypeFilter = (type: string) => {
+  // Handle type filtering with "AND" logic
+  const applyTypeFilters = async () => {
+    if (selectedTypes.value.length === 0) {
+      // If no types selected, return to normal (possibly filtered by search)
+      pokemonList.value = allPokemonData.value
+        .filter((pokemon: Result) =>
+          inputValue.value ? pokemon.name.includes(inputValue.value) : true
+        )
+        .slice(0, offset.value)
+      return
+    }
+
+    isLoading.value = true
+
+    // Get Pokémon for each selected type
+    const typePromises = selectedTypes.value.map((type) =>
+      fetchTypeDetails(type)
+    )
+    const typeResults = await Promise.all(typePromises)
+
+    // Create a map to count how many selected types each Pokémon has
+    const pokemonTypeCount = new Map<string, number>()
+
+    // Count occurrences of each Pokémon across all selected types
+    typeResults.forEach((typeData) => {
+      typeData.pokemon.forEach((p: any) => {
+        const pokemonName = p.pokemon.name
+        pokemonTypeCount.set(
+          pokemonName,
+          (pokemonTypeCount.get(pokemonName) || 0) + 1
+        )
+      })
+    })
+
+    // Filter Pokémon that have ALL selected types (equal to the count of selected types)
+    const filteredNames = Array.from(pokemonTypeCount.entries())
+      .filter(([, count]) => count === selectedTypes.value.length)
+      .map(([name]) => name)
+
+    // Apply both type filtering AND search filtering if needed
+    pokemonList.value = allPokemonData.value
+      .filter(
+        (pokemon) =>
+          filteredNames.includes(pokemon.name) &&
+          (inputValue.value ? pokemon.name.includes(inputValue.value) : true)
+      )
+      .slice(0, offset.value)
+
+    isLoading.value = false
+  }
+
+  // Toggle type selection and apply filters
+  const toggleTypeFilter = async (type: string) => {
     const index = selectedTypes.value.indexOf(type)
     if (index === -1) {
       selectedTypes.value.push(type)
     } else {
       selectedTypes.value.splice(index, 1)
     }
+
+    // Reset and reapply filters whenever type selection changes
+    offset.value = limit
+    await applyTypeFilters()
   }
 </script>
 
@@ -182,10 +259,15 @@
                 v-for="type in allPokemonTypes"
                 :key="type"
                 @click="toggleTypeFilter(type)"
-                class="transition-all duration-300 transform hover:scale-110"
-                :class="{
-                  'ring-2 ring-white scale-110': selectedTypes.includes(type),
-                }"
+                class="transition-all duration-300 transform hover:scale-110 focus:outline-none"
+                :class="[
+                  selectedTypes.includes(type)
+                    ? 'ring-2 ring-white scale-110'
+                    : '',
+                  selectedTypes.length > 0 && !selectedTypes.includes(type)
+                    ? 'opacity-70'
+                    : '',
+                ]"
               >
                 <PokemonType :type="type" />
               </button>
@@ -235,7 +317,7 @@
 
           <!-- Loading state -->
           <div
-            v-if="isLoading"
+            v-if="isLoading || isLoadingMore"
             class="flex flex-col items-center justify-center p-8 text-white text-center my-8"
           >
             <div
@@ -244,9 +326,42 @@
             <p class="mt-6 font-medium text-lg">Loading Pokémon...</p>
           </div>
 
+          <!-- Selected filters display -->
+          <div v-if="selectedTypes.length > 0" class="my-4 text-center">
+            <p class="text-white/90 mb-2">Active filters:</p>
+            <div class="flex flex-wrap justify-center gap-2">
+              <div
+                v-for="type in selectedTypes"
+                :key="type"
+                class="px-3 py-1 bg-white/20 rounded-full text-white text-sm flex items-center"
+              >
+                <span class="mr-1">{{ type }}</span>
+                <button
+                  @click="toggleTypeFilter(type)"
+                  class="text-white/80 hover:text-white"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Scroll indicator -->
           <div
-            v-if="!isLoading && pokemonList.length > 0"
+            v-if="!isLoading && !isLoadingMore && pokemonList.length > 0"
             class="flex flex-col items-center mt-10 text-white/80"
             ref="scrollIndicator"
           >
