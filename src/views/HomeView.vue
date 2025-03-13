@@ -1,12 +1,9 @@
 <script setup lang="ts">
-  import { useRouter } from 'vue-router'
   import { ref, onMounted, onUnmounted, watch } from 'vue'
   import { fetchPokemonList } from '../api/pokemonApi'
   import type { Result } from '../interfaces/Pokemon'
-  import { usePokemonStore } from '../store/pokemon'
+  import PokemonCard from '../components/pokemon/PokemonCard.vue'
 
-  const router = useRouter()
-  const pokemonStore = usePokemonStore()
   const inputValue = ref('')
   const pokemonList = ref<Result[]>([])
   const isLoading = ref(false)
@@ -42,18 +39,6 @@
     window.removeEventListener('scroll', handleScroll)
   })
 
-  const getPokemonImageUrl = (id: number) =>
-    `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`
-
-  const getPokemonIdFromUrl = (url: string) => {
-    const urlParts = url.split('/')
-    return parseInt(urlParts[urlParts.length - 2])
-  }
-
-  const goToPokemonDetail = (name: string) => {
-    router.push(`/pokemondetail/${name}`)
-  }
-
   const searchPokemon = async () => {
     isLoading.value = true
     offset.value = 0
@@ -68,23 +53,6 @@
     inputValue.value = ''
     offset.value = 0
     fetchPokemons()
-  }
-
-  const toggleFavorite = (pokemon: Result) => {
-    const id = getPokemonIdFromUrl(pokemon.url)
-    if (pokemonStore.isFavoritePokemon(pokemon.name)) {
-      pokemonStore.removeFavoritePokemon(pokemon.name)
-    } else {
-      pokemonStore.saveFavoritePokemon({
-        id,
-        name: pokemon.name,
-        url: `pokemon/${pokemon.name}`,
-      })
-    }
-  }
-
-  const isPokemonFavorite = (name: string) => {
-    return pokemonStore.isFavoritePokemon(name)
   }
 
   watch(inputValue, () => {
@@ -167,55 +135,13 @@
           tag="div"
           class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6"
         >
-          <div
+          <PokemonCard
             v-for="pokemon in pokemonList"
             :key="pokemon.name"
-            class="bg-red-500 rounded-xl overflow-hidden shadow-md cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg relative"
-          >
-            <div
-              class="absolute top-2 right-2 z-10"
-              @click.stop="toggleFavorite(pokemon)"
-            >
-              <img
-                v-if="isPokemonFavorite(pokemon.name)"
-                src="../assets/newStar.svg"
-                alt="Remove from Favorites"
-                class="w-6 h-6"
-              />
-              <img
-                v-else
-                src="../assets/newStarDisabled.svg"
-                alt="Add to Favorites"
-                class="w-6 h-6"
-              />
-            </div>
-            <div
-              class="bg-gradient-radial from-white/30 to-black/10 p-4 flex justify-center items-center h-30"
-              @click="goToPokemonDetail(pokemon.name)"
-            >
-              <img
-                :src="getPokemonImageUrl(getPokemonIdFromUrl(pokemon.url))"
-                :alt="pokemon.name"
-                class="w-20 h-20 object-contain transition-transform duration-300 filter drop-shadow-md hover:scale-110"
-                loading="lazy"
-              />
-            </div>
-            <div
-              class="bg-white p-3 relative"
-              @click="goToPokemonDetail(pokemon.name)"
-            >
-              <span
-                class="absolute -top-5 right-2.5 bg-black/60 text-white text-xs px-2 py-1 rounded-full font-bold"
-              >
-                #{{ getPokemonIdFromUrl(pokemon.url) }}
-              </span>
-              <h3
-                class="capitalize font-semibold text-base text-gray-900 text-center m-0"
-              >
-                {{ pokemon.name }}
-              </h3>
-            </div>
-          </div>
+            :pokemon="pokemon"
+            :showFavoriteButton="true"
+            :showId="true"
+          />
         </transition-group>
 
         <div

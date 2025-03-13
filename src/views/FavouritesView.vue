@@ -1,10 +1,9 @@
 <script setup lang="ts">
   import { ref, onMounted } from 'vue'
-  import { useRouter } from 'vue-router'
   import { usePokemonStore } from '../store/pokemon'
+  import PokemonCard from '../components/pokemon/PokemonCard.vue'
 
-  const router = useRouter()
-  const pokemonList = ref<{ name: string; sprite: string }[]>([])
+  const pokemonList = ref<{ name: string; sprite: string; id: number }[]>([])
   const store = usePokemonStore()
   const currentPage = ref(1)
   const itemsPerPage = ref(12)
@@ -17,6 +16,7 @@
     pokemonList.value = store.favoritePokemon.map((pokemon) => ({
       name: pokemon.name,
       sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png`,
+      id: pokemon.id,
     }))
     totalPokemons.value = store.totalFavoritePokemon
     isLoading.value = false
@@ -39,10 +39,6 @@
   }
 
   onMounted(loadData)
-
-  const goToPokemonDetail = (name: string) => {
-    router.push(`/pokemondetail/${name}`)
-  }
 </script>
 
 <template>
@@ -82,29 +78,13 @@
       </div>
 
       <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-        <div
+        <PokemonCard
           v-for="pokemon in pokemonList"
           :key="pokemon.name"
-          @click="goToPokemonDetail(pokemon.name)"
-          :data-test="`pokemon-${pokemon.name}`"
-          class="bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl group"
-        >
-          <div
-            class="bg-gradient-radial from-white/20 to-transparent p-4 flex justify-center items-center h-40"
-          >
-            <img
-              :src="pokemon.sprite"
-              :alt="pokemon.name"
-              class="w-32 h-32 object-contain transition-transform duration-300 filter drop-shadow-md group-hover:scale-110"
-              loading="lazy"
-            />
-          </div>
-          <div class="p-4 bg-gradient-to-b from-red-600 to-red-700">
-            <h3 class="capitalize font-bold text-lg text-white text-center">
-              {{ pokemon.name }}
-            </h3>
-          </div>
-        </div>
+          :pokemon="pokemon"
+          :showFavoriteButton="true"
+          :showId="true"
+        />
       </div>
 
       <div
