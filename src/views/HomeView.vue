@@ -42,7 +42,6 @@
     const response = await fetchPokemonList(limit, offset.value)
     allPokemonData.value = [...allPokemonData.value, ...response.results]
 
-    // Apply any active filters
     if (selectedTypes.value.length > 0) {
       await applyTypeFilters()
     } else {
@@ -110,10 +109,8 @@
     }, 300)
   })
 
-  // Handle type filtering with "AND" logic
   const applyTypeFilters = async () => {
     if (selectedTypes.value.length === 0) {
-      // If no types selected, return to normal (possibly filtered by search)
       pokemonList.value = allPokemonData.value
         .filter((pokemon: Result) =>
           inputValue.value ? pokemon.name.includes(inputValue.value) : true
@@ -124,16 +121,13 @@
 
     isLoading.value = true
 
-    // Get Pokémon for each selected type
     const typePromises = selectedTypes.value.map((type) =>
       fetchTypeDetails(type)
     )
     const typeResults = await Promise.all(typePromises)
 
-    // Create a map to count how many selected types each Pokémon has
     const pokemonTypeCount = new Map<string, number>()
 
-    // Count occurrences of each Pokémon across all selected types
     typeResults.forEach((typeData) => {
       typeData.pokemon.forEach((p: any) => {
         const pokemonName = p.pokemon.name
@@ -144,12 +138,10 @@
       })
     })
 
-    // Filter Pokémon that have ALL selected types (equal to the count of selected types)
     const filteredNames = Array.from(pokemonTypeCount.entries())
       .filter(([, count]) => count === selectedTypes.value.length)
       .map(([name]) => name)
 
-    // Apply both type filtering AND search filtering if needed
     pokemonList.value = allPokemonData.value
       .filter(
         (pokemon) =>
@@ -161,7 +153,6 @@
     isLoading.value = false
   }
 
-  // Toggle type selection and apply filters
   const toggleTypeFilter = async (type: string) => {
     const index = selectedTypes.value.indexOf(type)
     if (index === -1) {
@@ -170,7 +161,6 @@
       selectedTypes.value.splice(index, 1)
     }
 
-    // Reset and reapply filters whenever type selection changes
     offset.value = limit
     await applyTypeFilters()
   }
@@ -221,9 +211,9 @@
               <input
                 v-model="inputValue"
                 type="text"
-                placeholder="Search Pokémon by name..."
+                placeholder="Search Pokemon by name..."
                 class="flex-1 border-none text-base bg-transparent text-gray-800 py-2 focus:outline-none"
-                aria-label="Search Pokémon"
+                aria-label="Search Pokemon"
               />
               <button
                 v-if="inputValue"
@@ -309,7 +299,7 @@
                 d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <p class="text-2xl mb-2">No Pokémon found</p>
+            <p class="text-2xl mb-2">No Pokemon found</p>
             <p class="text-lg text-white/70">
               Try a different search term or filter
             </p>
@@ -323,7 +313,7 @@
             <div
               class="w-20 h-20 rounded-full border-4 border-white/30 border-t-white animate-spin shadow-lg"
             ></div>
-            <p class="mt-6 font-medium text-lg">Loading Pokémon...</p>
+            <p class="mt-6 font-medium text-lg">Loading Pokemon...</p>
           </div>
 
           <!-- Selected filters display -->

@@ -12,7 +12,6 @@
   const router = useRouter()
   const pokemonStore = usePokemonStore()
 
-  // Ensure we have favorites loaded initially
   onMounted(() => {
     if (pokemonStore.favoritePokemon.length === 0) {
       const storedFavorites = localStorage.getItem('favoritePokemon')

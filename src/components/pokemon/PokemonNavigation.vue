@@ -44,24 +44,32 @@
 </script>
 
 <template>
-  <div class="pokemon-navigation">
-    <div class="navigation-container">
+  <div class="w-full py-6 mt-4">
+    <div
+      class="flex justify-between items-center w-full bg-black/15 rounded-2xl p-6 shadow-lg backdrop-blur-md border border-white/10"
+    >
       <button
         v-if="previous"
         @click="router.push(`/pokemondetail/${previous.name}`)"
-        class="nav-button prev-button fade-in"
+        class="flex items-center bg-white/5 border border-white/10 cursor-pointer transition-all duration-300 ease-in-out p-3 rounded-xl shadow-md hover:translate-y-[-3px] hover:bg-white/10 hover:shadow-xl active:translate-y-[-1px] animate-fadeIn"
         :aria-label="previous ? `Go to ${previous.name}` : 'Go to previous'"
       >
-        <div class="pokemon-preview">
+        <div class="flex flex-col items-center max-w-[100px]">
           <img
             v-if="previous"
             :src="previous.sprites?.other['official-artwork'].front_default"
-            class="pokemon-image"
+            class="w-[90px] h-[90px] object-contain transition-transform duration-300 ease-in-out filter drop-shadow-lg hover:scale-110 hover:-rotate-5"
             :alt="previous.name"
           />
-          <span class="pokemon-name">{{ previous.name }}</span>
+          <span
+            class="mt-3 text-[0.95rem] text-white capitalize font-bold text-shadow shadow-black/50 tracking-wide"
+          >
+            {{ previous.name }}
+          </span>
         </div>
-        <div class="nav-arrow prev-arrow">
+        <div
+          class="flex justify-center items-center w-[42px] h-[42px] bg-sky-600 rounded-full shadow-md transition-all duration-300 ease-in-out ml-3 hover:scale-110 hover:bg-sky-700"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -70,7 +78,7 @@
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="arrow-icon"
+            class="w-[22px] h-[22px] text-white"
           >
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
@@ -79,15 +87,27 @@
 
       <button
         v-else
-        class="nav-button prev-button disabled fade-in"
+        class="flex items-center bg-white/5 border border-white/10 p-3 rounded-xl opacity-50 cursor-not-allowed animate-fadeIn"
         aria-label="No previous evolution"
         disabled
       >
-        <div class="pokemon-preview empty">
-          <div class="empty-pokemon"></div>
-          <span class="pokemon-name">No Previous</span>
+        <div class="flex flex-col items-center max-w-[100px]">
+          <div
+            class="w-[90px] h-[90px] bg-white/8 rounded-full flex items-center justify-center relative overflow-hidden"
+          >
+            <div
+              class="absolute w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent top-0 left-0 animate-shine"
+            ></div>
+          </div>
+          <span
+            class="mt-3 text-[0.95rem] text-white capitalize font-bold text-shadow shadow-black/50 tracking-wide"
+          >
+            No Previous
+          </span>
         </div>
-        <div class="nav-arrow prev-arrow disabled">
+        <div
+          class="flex justify-center items-center w-[42px] h-[42px] bg-sky-600 rounded-full shadow-md ml-3 opacity-50"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -96,23 +116,29 @@
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="arrow-icon"
+            class="w-[22px] h-[22px] text-white"
           >
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </div>
       </button>
 
-      <div class="alternatives-container fade-in">
-        <h3 class="alternatives-title">Alternative Images</h3>
+      <div
+        class="flex-1 max-w-[350px] flex flex-col items-center mx-5 animate-fadeIn"
+      >
+        <h3
+          class="text-[1.15rem] font-bold text-white mb-3 text-shadow shadow-black/30"
+        >
+          Alternative Images
+        </h3>
         <div
-          class="alternatives-carousel"
+          class="flex items-center bg-black/20 rounded-2xl p-3 shadow-inner border border-white/8 w-full"
           role="navigation"
           aria-label="Alternative Carousel"
         >
           <button
             @click="prevImage"
-            class="carousel-button"
+            class="flex justify-center items-center w-9 h-9 bg-red-500 rounded-xl cursor-pointer transition-all duration-200 ease-in-out shadow-md hover:bg-red-600 hover:scale-110 hover:shadow-lg active:scale-95"
             aria-label="Previous Alternative"
           >
             <svg
@@ -123,30 +149,30 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="carousel-arrow"
+              class="w-[18px] h-[18px] text-white"
             >
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
           </button>
 
-          <div class="alternatives-images">
+          <div class="flex gap-3 mx-3">
             <div
               v-for="(image, index) in visibleImages"
               :key="index"
-              class="alternative-image-container"
+              class="w-[60px] h-[60px] rounded-xl overflow-hidden cursor-pointer transition-all duration-250 ease-in-out bg-white/10 relative border-2 border-transparent shadow-md hover:translate-y-[-5px] hover:scale-105 hover:shadow-lg hover:border-white/30 hover:z-10"
               @click="selectImage(image)"
             >
               <img
                 :src="image"
                 alt="Alternative Image"
-                class="alternative-image"
+                class="w-full h-full object-contain transition-transform duration-300 ease hover:scale-110"
               />
             </div>
           </div>
 
           <button
             @click="nextImage"
-            class="carousel-button"
+            class="flex justify-center items-center w-9 h-9 bg-red-500 rounded-xl cursor-pointer transition-all duration-200 ease-in-out shadow-md hover:bg-red-600 hover:scale-110 hover:shadow-lg active:scale-95"
             aria-label="Next Alternative"
           >
             <svg
@@ -157,7 +183,7 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="carousel-arrow"
+              class="w-[18px] h-[18px] text-white"
             >
               <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
@@ -168,10 +194,12 @@
       <button
         v-if="next"
         @click="router.push(`/pokemondetail/${next.name}`)"
-        class="nav-button next-button fade-in"
+        class="flex items-center bg-white/5 border border-white/10 cursor-pointer transition-all duration-300 ease-in-out p-3 rounded-xl shadow-md hover:translate-y-[-3px] hover:bg-white/10 hover:shadow-xl active:translate-y-[-1px] animate-fadeIn"
         :aria-label="`Go to ${(next as PokemonDetails).name}`"
       >
-        <div class="nav-arrow next-arrow">
+        <div
+          class="flex justify-center items-center w-[42px] h-[42px] bg-sky-600 rounded-full shadow-md transition-all duration-300 ease-in-out mr-3 hover:scale-110 hover:bg-sky-700"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -180,28 +208,34 @@
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="arrow-icon"
+            class="w-[22px] h-[22px] text-white"
           >
             <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
         </div>
-        <div class="pokemon-preview">
+        <div class="flex flex-col items-center max-w-[100px]">
           <img
             :src="next.sprites?.other['official-artwork'].front_default"
-            class="pokemon-image"
+            class="w-[90px] h-[90px] object-contain transition-transform duration-300 ease-in-out filter drop-shadow-lg hover:scale-110 hover:rotate-5"
             :alt="next.name"
           />
-          <span class="pokemon-name">{{ next.name }}</span>
+          <span
+            class="mt-3 text-[0.95rem] text-white capitalize font-bold text-shadow shadow-black/50 tracking-wide"
+          >
+            {{ next.name }}
+          </span>
         </div>
       </button>
 
       <button
         v-else
-        class="nav-button next-button disabled fade-in"
+        class="flex items-center bg-white/5 border border-white/10 p-3 rounded-xl opacity-50 cursor-not-allowed animate-fadeIn"
         aria-label="No next evolution"
         disabled
       >
-        <div class="nav-arrow next-arrow disabled">
+        <div
+          class="flex justify-center items-center w-[42px] h-[42px] bg-sky-600 rounded-full shadow-md mr-3 opacity-50"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -210,128 +244,40 @@
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="arrow-icon"
+            class="w-[22px] h-[22px] text-white"
           >
             <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
         </div>
-        <div class="pokemon-preview empty">
-          <div class="empty-pokemon"></div>
-          <span class="pokemon-name">No Next</span>
+        <div class="flex flex-col items-center max-w-[100px]">
+          <div
+            class="w-[90px] h-[90px] bg-white/8 rounded-full flex items-center justify-center relative overflow-hidden"
+          >
+            <div
+              class="absolute w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent top-0 left-0 animate-shine"
+            ></div>
+          </div>
+          <span
+            class="mt-3 text-[0.95rem] text-white capitalize font-bold text-shadow shadow-black/50 tracking-wide"
+          >
+            No Next
+          </span>
         </div>
       </button>
     </div>
   </div>
 </template>
 
-<style scoped>
-  .pokemon-navigation {
-    width: 100%;
-    padding: 1.5rem 0;
-    margin-top: 1rem;
-  }
-
-  .navigation-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .nav-button {
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 0.75rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  .nav-button:hover {
-    transform: translateY(-3px);
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  }
-
-  .nav-button:active {
-    transform: translateY(-1px);
-  }
-
-  .nav-button.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
-
-  .pokemon-preview {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 100px;
-  }
-
-  .pokemon-image {
-    width: 90px;
-    height: 90px;
-    object-fit: contain;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-  }
-
-  .nav-button:hover .pokemon-image {
-    transform: scale(1.1) rotate(-5deg);
-  }
-
-  .next-button:hover .pokemon-image {
-    transform: scale(1.1) rotate(5deg);
-  }
-
-  .pokemon-name {
-    margin-top: 0.75rem;
-    font-size: 0.95rem;
-    color: white;
-    text-transform: capitalize;
-    font-weight: bold;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-    letter-spacing: 0.02em;
-  }
-
-  .empty-pokemon {
-    width: 90px;
-    height: 90px;
-    background-color: rgba(255, 255, 255, 0.08);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .empty-pokemon::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      45deg,
-      transparent 45%,
-      rgba(255, 255, 255, 0.1) 50%,
-      transparent 55%
-    );
-    top: 0;
-    left: 0;
-    animation: shine 3s infinite;
+<style>
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   @keyframes shine {
@@ -344,178 +290,47 @@
     }
   }
 
-  .nav-arrow {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 42px;
-    height: 42px;
-    background-color: #0284c7; /* bg-sky-600 */
-    border-radius: 50%;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .prev-button .nav-arrow {
-    margin-right: 0.75rem;
-  }
-
-  .next-button .nav-arrow {
-    margin-left: 0.75rem;
-  }
-
-  .nav-button:hover .nav-arrow {
-    transform: scale(1.1);
-    background-color: #0369a1; /* bg-sky-700 */
-  }
-
-  .arrow-icon {
-    width: 22px;
-    height: 22px;
-    color: white;
-  }
-
-  .alternatives-container {
-    flex: 1;
-    max-width: 350px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 0 1.25rem;
-  }
-
-  .alternatives-title {
-    font-size: 1.15rem;
-    font-weight: bold;
-    color: white;
-    margin-bottom: 0.75rem;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  }
-
-  .alternatives-carousel {
-    display: flex;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 1rem;
-    padding: 0.75rem;
-    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    width: 100%;
-  }
-
-  .carousel-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 36px;
-    height: 36px;
-    background-color: #ef4444; /* bg-red-500 */
-    border: none;
-    border-radius: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
-
-  .carousel-button:hover {
-    background-color: #dc2626; /* bg-red-600 */
-    transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  }
-
-  .carousel-button:active {
-    transform: scale(0.95);
-  }
-
-  .carousel-arrow {
-    width: 18px;
-    height: 18px;
-    color: white;
-  }
-
-  .alternatives-images {
-    display: flex;
-    gap: 0.75rem;
-    margin: 0 0.75rem;
-  }
-
-  .alternative-image-container {
-    width: 60px;
-    height: 60px;
-    border-radius: 0.75rem;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    background-color: rgba(255, 255, 255, 0.1);
-    position: relative;
-    border: 2px solid transparent;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  }
-
-  .alternative-image-container:hover {
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-    border-color: rgba(255, 255, 255, 0.3);
-    z-index: 1;
-  }
-
-  .alternative-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: transform 0.3s ease;
-  }
-
-  .alternative-image-container:hover .alternative-image {
-    transform: scale(1.1);
-  }
-
-  /* Animation classes */
-  .fade-in {
+  .animate-fadeIn {
     animation: fadeIn 0.6s ease-out forwards;
   }
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .animate-shine {
+    animation: shine 3s infinite;
   }
 
-  /* Responsive Styles */
+  .text-shadow {
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  }
+
   @media (max-width: 768px) {
-    .navigation-container {
+    .flex.justify-between.items-center {
       flex-direction: column;
       gap: 2rem;
       padding: 1.25rem;
     }
 
-    .alternatives-container {
+    .flex-1.max-w-\[350px\] {
       order: 3;
       max-width: 100%;
       margin: 1rem 0;
     }
 
-    .alternatives-title {
+    .text-\[1\.15rem\].font-bold.text-white {
       text-align: center;
     }
 
-    .nav-button {
+    button.flex.items-center {
       width: 100%;
       justify-content: space-between;
     }
   }
 
   @media (max-width: 480px) {
-    .alternatives-images {
+    .flex.gap-3 {
       gap: 0.5rem;
     }
 
-    .alternative-image-container {
+    .w-\[60px\].h-\[60px\] {
       width: 50px;
       height: 50px;
     }

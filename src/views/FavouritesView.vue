@@ -84,8 +84,8 @@
         </svg>
         <p class="text-2xl mb-2">No favorites yet</p>
         <p class="text-lg text-white/70">
-          Add some Pokémon to your favorites by clicking the star icon on any
-          Pokémon card!
+          Add some Pokemon to your favorites by clicking the star icon on any
+          Pokemon card!
         </p>
       </div>
 

@@ -5,7 +5,12 @@
     role="status"
     :aria-label="`Pokemon type: ${type}`"
   >
-    <span v-if="typeEmoji" class="type-icon">{{ typeEmoji }}</span>
+    <span
+      v-if="typeEmoji"
+      class="flex items-center justify-center mr-1 animate-pulse hover:animate-[wiggle_0.5s_ease-in-out] type-icon"
+    >
+      {{ typeEmoji }}
+    </span>
     <span class="flex-1 font-bold capitalize text-sm">{{ type }}</span>
   </div>
 </template>
@@ -109,31 +114,7 @@
   })
 </script>
 
-<style scoped>
-  .type-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 4px;
-    animation: pulse 2s infinite ease-in-out;
-  }
-
-  @keyframes pulse {
-    0% {
-      opacity: 0.7;
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0.7;
-    }
-  }
-
-  div:hover .type-icon {
-    animation: wiggle 0.5s ease-in-out;
-  }
-
+<style>
   @keyframes wiggle {
     0% {
       transform: rotate(0deg);
