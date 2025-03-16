@@ -9,6 +9,10 @@ export default {
     searchPlaceholder: 'Procurar Pokémon...',
     loading: 'Carregando...',
     noResults: 'Nenhum resultado encontrado',
+    cookieConsent:
+      'Usamos cookies para melhorar sua experiência na Pokédex. Se você continuar usando este site, você aceita o uso de cookies. Estes cookies nos ajudam a salvar seus Pokémon favoritos e lembrar suas preferências.',
+    accept: 'Aceitar',
+    decline: 'Recusar',
   },
   pokemon: {
     addFavorite: 'Adicionar aos Favoritos',

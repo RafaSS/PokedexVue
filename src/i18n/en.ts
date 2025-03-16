@@ -9,6 +9,10 @@ export default {
     searchPlaceholder: 'Search Pokemon...',
     loading: 'Loading...',
     noResults: 'No results found',
+    cookieConsent:
+      'We use cookies to enhance your Pokédex experience. If you continue using this site, you accept our use of cookies. These cookies help us save your favorite Pokémon and remember your preferences.',
+    accept: 'Accept',
+    decline: 'Decline',
   },
   pokemon: {
     addFavorite: 'Add to Favorites',

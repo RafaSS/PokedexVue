@@ -9,10 +9,7 @@
       >
         <div class="mb-4 sm:mb-0 pr-4">
           <p class="text-sm text-gray-700">
-            <span class="font-bold">🍪 Cookie Notice:</span>
-            We use cookies to enhance your Pokédex experience. If you continue
-            using this site, you accept our use of cookies. These cookies help
-            us save your favorite Pokémon and remember your preferences.
+            <span class="font-bold">🍪 {{ t('common.cookieConsent') }}</span>
           </p>
         </div>
         <div class="flex space-x-2">
@@ -20,13 +17,13 @@
             @click="acceptCookies"
             class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
           >
-            Accept
+            {{ t('common.accept') }}
           </button>
           <button
             @click="declineCookies"
             class="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
           >
-            Decline
+            {{ t('common.decline') }}
           </button>
         </div>
       </div>
@@ -37,6 +34,9 @@
 <script setup lang="ts">
   import { ref, onMounted } from 'vue'
   import { cookieService } from '../service/cookieService'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   const showConsent = ref(false)
 
