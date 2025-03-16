@@ -6,7 +6,7 @@ export default {
     logout: 'Logout',
   },
   common: {
-    searchPlaceholder: 'Search Pokémon...',
+    searchPlaceholder: 'Search Pokemon...',
     loading: 'Loading...',
     noResults: 'No results found',
   },
@@ -17,5 +17,14 @@ export default {
     abilities: 'Abilities',
     types: 'Types',
     weaknesses: 'Weaknesses',
+  },
+  pokemonNavigation: {
+    next: 'Next',
+    previous: 'Previous',
+    alternativeImages: 'Alternative Images',
+  },
+  home: {
+    title: 'Pokedex Explorer',
+    filter: 'Filter by Type',
   },
 }

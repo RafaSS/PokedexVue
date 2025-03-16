@@ -226,7 +226,7 @@
           <h2
             class="text-3xl md:text-4xl font-bold text-white mb-6 text-center animate-title-slide"
           >
-            Pokédex Explorer
+            {{ t('home.title') }}
           </h2>
 
           <!-- Search input -->
@@ -282,7 +282,7 @@
           <!-- Type filters -->
           <div class="mb-8">
             <h3 class="text-xl font-semibold text-white/90 mb-4 text-center">
-              Filter by Type
+              {{ t('home.filter') }}
             </h3>
             <div class="flex flex-wrap justify-center gap-2">
               <button

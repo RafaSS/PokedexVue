@@ -23,4 +23,8 @@ export default {
     previous: 'Anterior',
     alternativeImages: 'Imagens Alternativas',
   },
+  home: {
+    title: 'Explorar Pokédex',
+    filter: 'Filtrar por Tipo',
+  },
 }
