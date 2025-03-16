@@ -15,7 +15,6 @@ export const usePokemonStore = defineStore('pokemonStore', {
       try {
         this.loading = true
         this.error = null
-        console.log('Saving favorite pokemon 👌:', pokemon)
         const { error } = await favoriteService.addFavorite(pokemon)
         if (error) throw error
         this.favoritePokemon.push(pokemon)

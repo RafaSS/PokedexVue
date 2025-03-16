@@ -2,6 +2,7 @@
   <div
     class="flex overflow-hidden gap-2 justify-center items-center px-3 py-1 bg-opacity-90 rounded-xl shadow-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
     :class="[typeColor, textColor]"
+    style="background-color: transparent"
     role="status"
     :aria-label="`Pokemon type: ${type}`"
   >

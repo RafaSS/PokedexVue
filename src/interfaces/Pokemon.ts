@@ -53,9 +53,12 @@ export interface Pokemon {
 }
 
 export interface FavouritePokemon {
-  id: number
+  id?: number
+  pokemon_id: number
   name: string
   url: string
+  user_id?: string
+  created_at?: string
 }
 
 export interface Result {

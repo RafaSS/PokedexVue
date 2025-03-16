@@ -2,6 +2,9 @@
   import { computed, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { usePokemonStore } from '../../store/pokemon'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   const props = defineProps<{
     pokemon: any
@@ -66,8 +69,13 @@
     if (isFavorite.value) {
       pokemonStore.removeFavoritePokemon(props.pokemon.name)
     } else {
+      console.log('Saving favorite pokemon:', {
+        pokemon_id: id,
+        name: props.pokemon.name,
+        url: `pokemon/${props.pokemon.name}`,
+      })
       pokemonStore.saveFavoritePokemon({
-        id,
+        pokemon_id: id,
         name: props.pokemon.name,
         url: `pokemon/${props.pokemon.name}`,
       })
@@ -87,13 +95,13 @@
       <img
         v-if="isFavorite"
         src="../../assets/newStar.svg"
-        alt="Remove from Favorites"
+        :alt="t('pokemon.removeFavorite')"
         class="w-6 h-6 transition-transform duration-200 hover:scale-125"
       />
       <img
         v-else
         src="../../assets/newStarDisabled.svg"
-        alt="Add to Favorites"
+        :alt="t('pokemon.addFavorite')"
         class="w-6 h-6 transition-transform duration-200 hover:scale-125"
       />
     </div>

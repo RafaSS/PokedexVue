@@ -4,6 +4,10 @@
   import type { Result } from '../interfaces/Pokemon'
   import PokemonCard from '../components/pokemon/PokemonCard.vue'
   import PokemonType from '../components/pokemon/PokemonType.vue'
+  import { usePokemonStore } from '../store/pokemon.ts'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   const inputValue = ref('')
   const pokemonList = ref<Result[]>([])
@@ -14,6 +18,9 @@
   let debounceTimeout: ReturnType<typeof setTimeout> | undefined
   const selectedTypes = ref<string[]>([])
   const isLoadingMore = ref(false)
+  const hasMorePokemon = ref(true)
+
+  const pokemonStore = usePokemonStore()
   const allPokemonTypes = [
     'normal',
     'fire',
@@ -36,13 +43,26 @@
   ]
 
   const fetchPokemons = async () => {
-    if (isLoading.value || isLoadingMore.value) return
-
+    if (isLoading.value || isLoadingMore.value || !hasMorePokemon.value) return
     isLoadingMore.value = true
     const response = await fetchPokemonList(limit, offset.value)
-    allPokemonData.value = [...allPokemonData.value, ...response.results]
+    console.log('response', response)
+    //check if response.result has overlap with pokemonList
+    const hasOverlap = pokemonList.value.some((pokemon: Result) =>
+      response.results.some((result: Result) => result.name === pokemon.name)
+    )
+    if (
+      response.results.length === 0 ||
+      response.results.length < limit ||
+      hasOverlap
+    ) {
+      hasMorePokemon.value = false
+      isLoadingMore.value = false
+      return
+    }
 
-    if (selectedTypes.value.length > 0) {
+    allPokemonData.value = [...allPokemonData.value, ...response.results]
+    if (selectedTypes.value.length > 0 || inputValue.value !== '') {
       await applyTypeFilters()
     } else {
       pokemonList.value = [...allPokemonData.value]
@@ -54,9 +74,8 @@
 
   const handleScroll = () => {
     const scrollPosition = window.innerHeight + window.scrollY
-    const scrollThreshold = document.documentElement.scrollHeight * 0.8 // Load when user scrolls to 80% of the page
+    const scrollThreshold = document.documentElement.scrollHeight * 0.8
 
-    // Only fetch more if we're not at the bottom of the page
     if (
       scrollPosition >= scrollThreshold &&
       scrollPosition < document.documentElement.scrollHeight - 10
@@ -68,6 +87,7 @@
   onMounted(async () => {
     await fetchPokemons()
     window.addEventListener('scroll', handleScroll)
+    await pokemonStore.loadFavoritePokemon(1, 100)
   })
 
   onUnmounted(() => {
@@ -75,25 +95,29 @@
   })
 
   const searchPokemon = async () => {
+    hasMorePokemon.value = true
     isLoading.value = true
-    offset.value = 0
     const response = await fetchPokemonList(10000, 0)
     allPokemonData.value = response.results
 
     if (selectedTypes.value.length > 0) {
       await applyTypeFilters()
     } else {
-      pokemonList.value = allPokemonData.value
-        .filter((pokemon: Result) => pokemon.name.includes(inputValue.value))
-        .slice(0, limit)
+      // Show all matching results instead of just the first 30
+      pokemonList.value = allPokemonData.value.filter((pokemon: Result) =>
+        pokemon.name.includes(inputValue.value)
+      )
+      console.log('pokemonList 😊', pokemonList.value)
     }
 
+    console.log('allPokemonData', allPokemonData.value)
     isLoading.value = false
   }
 
   const clearSearch = () => {
     inputValue.value = ''
     offset.value = 0
+    hasMorePokemon.value = true
     fetchPokemons()
   }
 
@@ -111,23 +135,33 @@
 
   const applyTypeFilters = async () => {
     if (selectedTypes.value.length === 0) {
-      pokemonList.value = allPokemonData.value
-        .filter((pokemon: Result) =>
-          inputValue.value ? pokemon.name.includes(inputValue.value) : true
-        )
-        .slice(0, offset.value)
+      // Show all matching results without limiting to offset
+      pokemonList.value = allPokemonData.value.filter((pokemon: Result) =>
+        inputValue.value ? pokemon.name.includes(inputValue.value) : true
+      )
       return
     }
 
-    isLoading.value = true
-
+    // Fetch details for each selected type in parallel
     const typePromises = selectedTypes.value.map((type) =>
       fetchTypeDetails(type)
     )
     const typeResults = await Promise.all(typePromises)
-
+    //select the type with the most Pokemon and make it pokemonList
+    const typeWithMostPokemon = typeResults.reduce((prev, curr) => {
+      const prevCount = prev.pokemon.length
+      const currCount = curr.pokemon.length
+      return prevCount > currCount ? prev : curr
+    })
+    // console.log('typeWithMostPokemon:', typeWithMostPokemon.pokemon[0].pokemon)
+    allPokemonData.value = typeWithMostPokemon.pokemon.map(
+      (p: any) => p.pokemon
+    )
+    console.log('allPokemonData:', allPokemonData.value)
+    // Create a map to count how many selected types each Pokemon has
     const pokemonTypeCount = new Map<string, number>()
 
+    // Populate the map by counting type occurrences for each Pokemon
     typeResults.forEach((typeData) => {
       typeData.pokemon.forEach((p: any) => {
         const pokemonName = p.pokemon.name
@@ -137,23 +171,29 @@
         )
       })
     })
-
-    const filteredNames = Array.from(pokemonTypeCount.entries())
+    console.log('allPokemonData:', allPokemonData.value)
+    // Get Pokemon names that have all selected types
+    const filteredPokemon = Array.from(pokemonTypeCount.entries())
       .filter(([, count]) => count === selectedTypes.value.length)
-      .map(([name]) => name)
+      .map(([pokemon]) => pokemon)
 
-    pokemonList.value = allPokemonData.value
-      .filter(
-        (pokemon) =>
-          filteredNames.includes(pokemon.name) &&
+    // Filter the Pokemon list by type and search term without slicing
+    if (filteredPokemon.length > 0) {
+      pokemonList.value = allPokemonData.value.filter(
+        (pokemon: Result) =>
+          filteredPokemon.some((f) => f === pokemon.name) &&
           (inputValue.value ? pokemon.name.includes(inputValue.value) : true)
       )
-      .slice(0, offset.value)
-
+    } else {
+      pokemonList.value = []
+    }
+    console.log('pokemonList:', pokemonList.value)
     isLoading.value = false
+    isLoadingMore.value = false
   }
 
   const toggleTypeFilter = async (type: string) => {
+    if (isLoading.value) return
     const index = selectedTypes.value.indexOf(type)
     if (index === -1) {
       selectedTypes.value.push(type)
@@ -211,7 +251,7 @@
               <input
                 v-model="inputValue"
                 type="text"
-                placeholder="Search Pokemon by name..."
+                :placeholder="t('common.searchPlaceholder')"
                 class="flex-1 border-none text-base bg-transparent text-gray-800 py-2 focus:outline-none"
                 aria-label="Search Pokemon"
               />
@@ -265,24 +305,26 @@
           </div>
 
           <!-- Pokemon grid with transition effects -->
-          <transition-group
+          <!-- <transition-group -->
+          <div
             name="pokemon-grid"
             tag="div"
             class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"
           >
             <PokemonCard
-              v-for="pokemon in pokemonList"
-              :key="pokemon.name"
+              v-for="(pokemon, index) in pokemonList"
+              :key="`${pokemon.name}-${index}`"
               :pokemon="pokemon"
               :showFavoriteButton="true"
               :showId="true"
               class="transition-all duration-300 transform hover:scale-105"
             />
-          </transition-group>
+          </div>
+          <!-- </transition-group> -->
 
           <!-- Empty state -->
           <div
-            v-if="pokemonList.length === 0 && !isLoading"
+            v-if="pokemonList.length === 0 && !isLoading && !hasMorePokemon"
             class="flex flex-col items-center justify-center p-10 bg-white/10 backdrop-blur-sm rounded-2xl text-white text-center my-12 shadow-inner"
           >
             <svg
@@ -299,7 +341,7 @@
                 d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <p class="text-2xl mb-2">No Pokemon found</p>
+            <p class="text-2xl mb-2">{{ t('common.noResults') }}</p>
             <p class="text-lg text-white/70">
               Try a different search term or filter
             </p>
@@ -313,7 +355,7 @@
             <div
               class="w-20 h-20 rounded-full border-4 border-white/30 border-t-white animate-spin shadow-lg"
             ></div>
-            <p class="mt-6 font-medium text-lg">Loading Pokemon...</p>
+            <p class="mt-6 font-medium text-lg">{{ t('common.loading') }}</p>
           </div>
 
           <!-- Selected filters display -->
@@ -351,7 +393,12 @@
 
           <!-- Scroll indicator -->
           <div
-            v-if="!isLoading && !isLoadingMore && pokemonList.length > 0"
+            v-if="
+              !isLoading &&
+              !isLoadingMore &&
+              pokemonList.length > 0 &&
+              hasMorePokemon
+            "
             class="flex flex-col items-center mt-10 text-white/80"
             ref="scrollIndicator"
           >
@@ -370,6 +417,19 @@
                 d="M19 14l-7 7m0 0l-7-7m7 7V3"
               />
             </svg>
+          </div>
+
+          <!-- End of results message -->
+          <div
+            v-if="
+              !isLoading &&
+              !isLoadingMore &&
+              pokemonList.length > 0 &&
+              !hasMorePokemon
+            "
+            class="text-center mt-10 text-white/90 p-4"
+          >
+            <p class="font-medium">You've reached the end of the list</p>
           </div>
         </div>
       </div>
@@ -395,6 +455,7 @@
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -406,6 +467,7 @@
       opacity: 0;
       transform: translateY(-20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -417,10 +479,12 @@
       opacity: 0.6;
       transform: scale(0.95);
     }
+
     50% {
       opacity: 1;
       transform: scale(1.05);
     }
+
     100% {
       opacity: 0.6;
       transform: scale(0.95);

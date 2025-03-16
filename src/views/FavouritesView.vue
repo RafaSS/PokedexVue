@@ -12,11 +12,12 @@
 
   const loadData = async () => {
     isLoading.value = true
-    store.loadFavoritePokemon(currentPage.value, itemsPerPage.value)
+    await store.loadFavoritePokemon(currentPage.value, itemsPerPage.value)
+    console.log('Favorite Pokemon:', store.favoritePokemon)
     pokemonList.value = store.favoritePokemon.map((pokemon) => ({
       name: pokemon.name,
-      sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png`,
-      id: pokemon.id,
+      sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.pokemon_id}.png`,
+      id: pokemon.pokemon_id,
     }))
     totalPokemons.value = store.totalFavoritePokemon
     isLoading.value = false
@@ -181,6 +182,7 @@
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -192,6 +194,7 @@
       opacity: 0;
       transform: translateY(-20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -203,10 +206,12 @@
       opacity: 0.6;
       transform: scale(0.95);
     }
+
     50% {
       opacity: 1;
       transform: scale(1.05);
     }
+
     100% {
       opacity: 0.6;
       transform: scale(0.95);

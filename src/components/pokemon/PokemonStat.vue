@@ -1,19 +1,3 @@
-<template>
-  <div class="stat-container">
-    <div class="stat-header">
-      <div class="stat-label">{{ formattedLabel }}</div>
-      <div class="stat-value">{{ value }}</div>
-    </div>
-    <div class="stat-bar-container">
-      <div
-        class="stat-bar"
-        :style="{ width: barWidth, backgroundColor: barColor }"
-        :class="{ 'animate-pulse': value > 90 }"
-      ></div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
   import { computed } from 'vue'
 
@@ -41,6 +25,22 @@
     return '#F44336'
   })
 </script>
+
+<template>
+  <div class="stat-container">
+    <div class="stat-header">
+      <div class="stat-label">{{ formattedLabel }}</div>
+      <div class="stat-value">{{ value }}</div>
+    </div>
+    <div class="stat-bar-container">
+      <div
+        class="stat-bar"
+        :style="{ width: barWidth, backgroundColor: barColor }"
+        :class="{ 'animate-pulse': value > 90 }"
+      ></div>
+    </div>
+  </div>
+</template>
 
 <style scoped>
   .stat-container {

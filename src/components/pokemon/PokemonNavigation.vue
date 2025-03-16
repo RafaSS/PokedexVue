@@ -2,6 +2,9 @@
   import { ref, computed } from 'vue'
   import { PokemonDetails } from '../../interfaces/Pokemon'
   import { useRouter } from 'vue-router'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   const router = useRouter()
 
@@ -67,7 +70,7 @@
             {{ previous.name }}
           </span>
         </div>
-        <div
+        <!-- <div
           class="flex justify-center items-center w-[42px] h-[42px] bg-sky-600 rounded-full shadow-md transition-all duration-300 ease-in-out ml-3 hover:scale-110 hover:bg-sky-700"
         >
           <svg
@@ -82,7 +85,7 @@
           >
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
-        </div>
+        </div> -->
       </button>
 
       <button
@@ -102,10 +105,10 @@
           <span
             class="mt-3 text-[0.95rem] text-white capitalize font-bold text-shadow shadow-black/50 tracking-wide"
           >
-            No Previous
+            {{ t('pokemonNavigation.previous') }}
           </span>
         </div>
-        <div
+        <!-- <div
           class="flex justify-center items-center w-[42px] h-[42px] bg-sky-600 rounded-full shadow-md ml-3 opacity-50"
         >
           <svg
@@ -120,16 +123,17 @@
           >
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
-        </div>
+        </div> -->
       </button>
 
+      <!-- Alternative Images -->
       <div
         class="flex-1 max-w-[350px] flex flex-col items-center mx-5 animate-fadeIn"
       >
         <h3
           class="text-[1.15rem] font-bold text-white mb-3 text-shadow shadow-black/30"
         >
-          Alternative Images
+          {{ t('pokemonNavigation.alternativeImages') }}
         </h3>
         <div
           class="flex items-center bg-black/20 rounded-2xl p-3 shadow-inner border border-white/8 w-full"
@@ -197,7 +201,7 @@
         class="flex items-center bg-white/5 border border-white/10 cursor-pointer transition-all duration-300 ease-in-out p-3 rounded-xl shadow-md hover:translate-y-[-3px] hover:bg-white/10 hover:shadow-xl active:translate-y-[-1px] animate-fadeIn"
         :aria-label="`Go to ${(next as PokemonDetails).name}`"
       >
-        <div
+        <!-- <div
           class="flex justify-center items-center w-[42px] h-[42px] bg-sky-600 rounded-full shadow-md transition-all duration-300 ease-in-out mr-3 hover:scale-110 hover:bg-sky-700"
         >
           <svg
@@ -212,7 +216,7 @@
           >
             <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
-        </div>
+        </div> -->
         <div class="flex flex-col items-center max-w-[100px]">
           <img
             :src="next.sprites?.other['official-artwork'].front_default"
@@ -233,7 +237,7 @@
         aria-label="No next evolution"
         disabled
       >
-        <div
+        <!-- <div
           class="flex justify-center items-center w-[42px] h-[42px] bg-sky-600 rounded-full shadow-md mr-3 opacity-50"
         >
           <svg
@@ -248,7 +252,7 @@
           >
             <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
-        </div>
+        </div> -->
         <div class="flex flex-col items-center max-w-[100px]">
           <div
             class="w-[90px] h-[90px] bg-white/8 rounded-full flex items-center justify-center relative overflow-hidden"
@@ -260,7 +264,7 @@
           <span
             class="mt-3 text-[0.95rem] text-white capitalize font-bold text-shadow shadow-black/50 tracking-wide"
           >
-            No Next
+            {{ t('pokemonNavigation.next') }}
           </span>
         </div>
       </button>

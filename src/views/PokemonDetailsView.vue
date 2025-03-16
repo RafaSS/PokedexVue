@@ -18,6 +18,9 @@
     PokemonSpecies,
   } from '../interfaces/Pokemon'
   import { usePokemonStore } from '../store/pokemon'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   const route = useRoute()
   const pokemonDetail = ref<PokemonDetails>()
@@ -108,7 +111,7 @@
           pokemonSpecies.value?.evolution_chain.url as string
         )
       )
-      isFavorite.value = usePokemonStore().isFavoritePokemon(
+      isFavorite.value = await usePokemonStore().isFavoritePokemon(
         pokemonDetail.value.name as string
       )
 
@@ -243,7 +246,7 @@
       store.removeFavoritePokemon(pokemonDetail.value?.name as string)
     } else {
       store.saveFavoritePokemon({
-        id: pokemonDetail.value?.id as number,
+        pokemon_id: pokemonDetail.value?.id as number,
         name: pokemonDetail.value?.name as string,
         url: 'pokemon/' + pokemonDetail.value?.name,
       })
@@ -309,7 +312,7 @@
           class="absolute top-4 right-4 cursor-pointer z-10 transform transition-transform duration-300 hover:scale-110"
           @click="toggleFavorite"
           :aria-label="
-            isFavorite ? 'Remove from Favorites' : 'Add to Favorites'
+            isFavorite ? t('pokemon.removeFavorite') : t('pokemon.addFavorite')
           "
         >
           <svg
@@ -322,6 +325,7 @@
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
+            style="background: transparent"
           >
             <path
               d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
@@ -361,7 +365,9 @@
 
             <!-- Types -->
             <div class="flex items-center gap-4 mb-4">
-              <span class="text-white/90 font-semibold">Types:</span>
+              <span class="text-white/90 font-semibold">
+                {{ t('pokemon.types') }}:
+              </span>
               <div class="flex gap-2">
                 <PokemonType
                   v-for="type in pokemonDetail?.types"
@@ -374,7 +380,9 @@
 
             <!-- Weaknesses -->
             <div class="flex items-center gap-4 mb-6">
-              <span class="text-white/90 font-semibold">Weaknesses:</span>
+              <span class="text-white/90 font-semibold">
+                {{ t('pokemon.weaknesses') }}:
+              </span>
               <div class="flex flex-wrap gap-2">
                 <PokemonType
                   v-for="weakness in weaknesses"
@@ -387,6 +395,9 @@
 
             <!-- Stats -->
             <div class="grid grid-cols-2 gap-x-6 gap-y-3">
+              <h3 class="col-span-2 text-white/90 font-semibold mb-2">
+                {{ t('pokemon.stats') }}
+              </h3>
               <PokemonStat
                 v-for="(stat, index) in pokemonDetail?.stats"
                 :key="index"
@@ -394,6 +405,20 @@
                 :value="stat.base_stat"
                 class="transition-all duration-300 hover:translate-x-1"
               />
+            </div>
+
+            <!-- Abilities -->
+            <h3 class="text-white/90 font-semibold mt-6 mb-2">
+              {{ t('pokemon.abilities') }}
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              <span
+                v-for="ability in pokemonDetail?.abilities"
+                :key="ability.ability.name"
+                class="bg-white/10 text-white px-3 py-1 rounded-lg capitalize transition-all duration-300 hover:bg-white/20 hover:scale-105 shadow-sm"
+              >
+                {{ ability.ability.name }}
+              </span>
             </div>
           </div>
         </div>
@@ -430,6 +455,7 @@
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -440,9 +466,11 @@
     0% {
       transform: scale(1);
     }
+
     50% {
       transform: scale(1.4);
     }
+
     100% {
       transform: scale(1);
     }
