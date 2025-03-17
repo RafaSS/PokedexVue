@@ -31,6 +31,7 @@ export default [
       ...pluginVue.configs['vue3-essential'].rules,
       ...typescript.configs.recommended.rules,
       '@typescript-eslint/no-explicit-any': 'off',
+      'linebreak-style': ['error', 'crlf']
     }
   }
 ];
